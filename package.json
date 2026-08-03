@@ -1,0 +1,30 @@
+{
+  "name": "enginex-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Enginex AI monorepo — AI-native engineering platform for CAD, PCB, and simulation",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "type-check": "turbo run type-check",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "turbo": "^2.1.0",
+    "prettier": "^3.3.3",
+    "husky": "^9.1.5"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

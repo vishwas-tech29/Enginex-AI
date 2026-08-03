@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+**/node_modules/
+
+# Next.js
+.next/
+out/
+apps/web/.next/
+
+# Turbo
+.turbo/
+
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.local.example
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Alembic (allow versions, ignore local sqlite db if used)
+*.sqlite3

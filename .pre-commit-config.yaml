@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: check-merge-conflict
+
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+        files: ^services/backend/
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+        files: ^services/backend/
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        files: ^services/backend/
+        args: ["--max-line-length=100"]
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: pnpm --filter web lint
+        language: system
+        files: ^apps/web/.*\.(ts|tsx)$
+        pass_filenames: false
+      - id: prettier
+        name: prettier
+        entry: pnpm exec prettier --check
+        language: system
+        files: \.(ts|tsx|js|jsx|json|md|yml|yaml)$

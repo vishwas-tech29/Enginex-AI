@@ -1,21 +1,53 @@
 # Enginex AI
 
-This workspace contains a full architecture blueprint and scaffolding for an AI-native engineering platform.
+An AI-native engineering platform for CAD, PCB design, simulation, and
+collaboration. This repo is a pnpm/Turborepo monorepo: a Next.js web app, a
+FastAPI backend, and shared TypeScript packages.
 
-## Included assets
+## Status
 
-- Architecture overview: [docs/architecture/complete-architecture.md](docs/architecture/complete-architecture.md)
-- Component design: [docs/architecture/component-design.md](docs/architecture/component-design.md)
-- Service layer: [docs/architecture/service-layer.md](docs/architecture/service-layer.md)
-- AI agent definitions: [docs/architecture/ai-agents.md](docs/architecture/ai-agents.md)
-- Security architecture: [docs/architecture/security-architecture.md](docs/architecture/security-architecture.md)
-- Development roadmap: [docs/architecture/roadmap.md](docs/architecture/roadmap.md)
-- Database schema: [docs/architecture/database-schema.sql](docs/architecture/database-schema.sql)
-- API contract: [docs/architecture/api-spec.yaml](docs/architecture/api-spec.yaml)
-- Local compose deployment: [docs/architecture/docker-compose.yml](docs/architecture/docker-compose.yml)
-- Kubernetes manifests: [deployments/k8s/backend-deployment.yaml](deployments/k8s/backend-deployment.yaml) and [deployments/k8s/frontend-deployment.yaml](deployments/k8s/frontend-deployment.yaml)
+**Step 1 — Foundation** is complete: monorepo scaffold, database schema +
+migration, Docker Compose dev environment, working auth (register/login/JWT),
+and CI. See [docs/architecture/roadmap.md](docs/architecture/roadmap.md) for
+what's next.
 
-## Project scaffold
+## Tech stack
 
-- Frontend: [apps/web/README.md](apps/web/README.md)
-- Backend: [services/backend/README.md](services/backend/README.md)
+- **Frontend:** Next.js 14, React 18, TypeScript (strict), Tailwind CSS, Zustand, TanStack Query
+- **Backend:** FastAPI, Python 3.11, SQLAlchemy 2.0, Pydantic v2, Alembic
+- **Data:** PostgreSQL 15, Redis 7, RabbitMQ 3
+- **Tooling:** pnpm workspaces + Turborepo, Docker Compose, GitHub Actions
+
+## Quick start
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+Frontend at http://localhost:3000, backend at http://localhost:8000 (Swagger
+UI at `/docs`). Full instructions, native (non-Docker) setup, and
+troubleshooting: [docs/SETUP.md](docs/SETUP.md).
+
+## Repository layout
+
+```
+apps/web/            Next.js frontend
+services/backend/    FastAPI backend
+packages/types/       Shared TypeScript types
+packages/utils/        Shared TypeScript utilities
+deployments/k8s/      Kubernetes manifests (production reference)
+docs/architecture/    Architecture blueprint (system design, schema, roadmap)
+docs/                 Practical guides: setup, standards, git workflow, API, DB
+```
+
+## Documentation
+
+- [Architecture blueprint](docs/architecture/complete-architecture.md) — system design, AI layer, deployment, security
+- [Development roadmap](docs/architecture/roadmap.md)
+- [Setup guide](docs/SETUP.md)
+- [Database reference](docs/DATABASE.md)
+- [API reference](docs/API.md)
+- [Coding standards](docs/CODING_STANDARDS.md)
+- [Git workflow](docs/GIT_WORKFLOW.md)
+- [Contributing](docs/CONTRIBUTING.md)
