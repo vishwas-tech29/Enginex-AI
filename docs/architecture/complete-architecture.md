@@ -1,22 +1,26 @@
 # Enginex AI — Production Architecture Blueprint
 
-## 1. System architecture diagram
+## 1. System architecture overview
+
+Enginex AI is an AI-native engineering platform for CAD, PCB design, simulation, and collaboration. The architecture below is organized so the platform can scale from a startup team to global enterprises while keeping domain workflows fast, secure, and observable.
+
+### System diagram
 
 ```mermaid
 flowchart LR
     subgraph Clients[Client Layer]
-        Web[Web App Next.js]
+        Web[Web App / Next.js]
         Mobile[Mobile App]
         Desktop[Desktop Client]
     end
 
-    subgraph Edge[Edge / API Layer]
+    subgraph Edge[Edge and API]
         GW[API Gateway / BFF]
         Auth[Auth + RBAC]
-        RL[Rate Limiting / WAF]
+        RL[Rate Limiting + WAF]
     end
 
-    subgraph Core[Core Services]
+    subgraph Core[Core Product Services]
         Users[User Service]
         Projects[Project Service]
         CAD[CAD Service]
@@ -28,12 +32,12 @@ flowchart LR
         Billing[Billing Service]
     end
 
-    subgraph Data[Data Layer]
+    subgraph Data[Data and Messaging]
         PG[(PostgreSQL)]
         Redis[(Redis)]
         MQ[(RabbitMQ)]
-        S3[(S3 / Object Storage)]
-        Qdrant[(Qdrant)]
+        S3[(Object Storage / S3)]
+        Qdrant[(Qdrant Vector DB)]
     end
 
     subgraph AIStack[AI Layer]
@@ -45,7 +49,7 @@ flowchart LR
     end
 
     subgraph External[External Systems]
-        ComponentDB[Component Databases]
+        Components[Component Databases]
         Datasheets[Datasheets / Standards]
         Stripe[Stripe / Billing]
         SSO[SSO Providers]
@@ -85,7 +89,7 @@ flowchart LR
     AI --> RAG
     Billing --> Stripe
     Auth --> SSO
-    ComponentDB --> PCB
+    Components --> PCB
     Datasheets --> RAG
 ```
 
@@ -96,8 +100,8 @@ flowchart LR
 ```text
 apps/web/
 ├── src/
-│   ├── pages/
-│   ├── components/
+│   ├── pages/               # Next.js route pages
+│   ├── components/          # Reusable domain components
 │   │   ├── common/
 │   │   ├── auth/
 │   │   ├── projects/
@@ -105,36 +109,36 @@ apps/web/
 │   │   ├── pcb/
 │   │   ├── ai/
 │   │   └── shared/
-│   ├── modules/
+│   ├── modules/             # Feature modules
 │   │   ├── cad-editor/
 │   │   ├── pcb-editor/
 │   │   ├── ai-chat/
 │   │   └── [others]/
-│   ├── services/
-│   ├── hooks/
-│   ├── store/
-│   ├── types/
-│   ├── utils/
-│   ├── styles/
-│   └── layout/
+│   ├── services/            # API clients, WebSocket, storage
+│   ├── hooks/               # Shared React hooks
+│   ├── store/               # Zustand stores
+│   ├── types/               # TypeScript models
+│   ├── utils/               # Geometry, math, formatting
+│   ├── styles/              # Global styles and Tailwind setup
+│   └── layout/              # App shell, sidebars, toolbars
 ├── public/
-└── package.json
+└── [config files]
 ```
 
-### State management
+### State management strategy
 
-- Zustand for global UI, editor, project, settings, auth state
-- TanStack Query for server state and synchronization
-- Local state for forms, temporary selections, transient overlays
+- Zustand manages auth, project context, editor state, UI state, and settings.
+- TanStack Query handles server data, cache refresh, and optimistic updates.
+- Local state remains limited to form values, transient selection, and overlays.
 
-### Rendering strategy
+### Rendering and collaboration
 
-- 2D canvas: Fabric.js or Konva for schematics and 2D editing
-- 3D viewport: Three.js + React Three Fiber for assemblies and CAD solids
-- Performance: LOD, instancing, occlusion culling, GPU-accelerated rendering
-- Collaboration: Yjs CRDT documents per editor, WebSocket transport, presence awareness
+- Fabric.js or Konva powers 2D CAD and PCB schematic canvases.
+- Three.js with React Three Fiber powers 3D assemblies and viewport navigation.
+- WebGL rendering supports millions of vertices with LOD, occlusion culling, and instancing.
+- Each document has a Yjs CRDT state and uses a WebSocket transport for presence and change propagation.
 
-### Key modules
+### Core modules
 
 - modules/cad-editor
   - Canvas.tsx
@@ -217,7 +221,7 @@ async def create_sketch(
     return SketchResponse(**sketch)
 ```
 
-### Service pattern
+### Service layer pattern
 
 ```python
 class CADService:
@@ -237,11 +241,13 @@ class CADService:
 
 ### WebSocket design
 
-- Project channel: broadcast editor change events
-- AI channel: stream agent response tokens
-- Presence channel: cursor and selection updates
+- Project channel: broadcast editor change events.
+- AI channel: stream agent response tokens.
+- Presence channel: cursor and selection updates.
 
 ## 4. Database architecture
+
+The relational core stores identity, projects, files, design artifacts, AI interactions, and billing metadata. JSONB is used for flexible design-specific payloads such as geometry parameters, board settings, and tool call records.
 
 ### Core tables
 
@@ -249,7 +255,6 @@ class CADService:
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-CREATE TYPE user_role AS ENUM ('owner', 'admin', 'member', 'viewer');
 CREATE TYPE project_type AS ENUM ('cad', 'pcb', 'mixed', 'robotics');
 CREATE TYPE project_status AS ENUM ('active', 'archived');
 CREATE TYPE subscription_tier AS ENUM ('free', 'pro', 'enterprise');
@@ -462,352 +467,83 @@ CREATE INDEX idx_files_project_id ON files(project_id);
 CREATE INDEX idx_projects_organization_id ON projects(organization_id);
 CREATE INDEX idx_cad_objects_file_id ON cad_objects(file_id);
 CREATE INDEX idx_ai_messages_chat_id ON ai_messages(chat_id);
+CREATE INDEX idx_agent_memory_agent_id ON agent_memory(agent_id);
 CREATE INDEX idx_usage_logs_org_date ON usage_logs(organization_id, created_at);
 CREATE INDEX idx_audit_logs_user_created ON audit_logs(user_id, created_at);
 ```
 
-## 5. API specification (OpenAPI 3.0)
-
-```yaml
-openapi: 3.0.3
-info:
-  title: Enginex AI API
-  version: 1.0.0
-servers:
-  - url: https://api.enginex.ai
-paths:
-  /api/v1/auth/register:
-    post:
-      summary: Register a user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [email, password, name]
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
-                name:
-                  type: string
-      responses:
-        '201':
-          description: Created
-
-  /api/v1/projects:
-    get:
-      summary: List projects
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: OK
-    post:
-      summary: Create project
-      security:
-        - bearerAuth: []
-      responses:
-        '201':
-          description: Created
-
-  /api/v1/projects/{project_id}/cad/sketch:
-    post:
-      summary: Create a sketch
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: project_id
-          required: true
-          schema:
-            type: string
-      responses:
-        '201':
-          description: Created
-
-  /api/v1/projects/{project_id}/pcb/board:
-    post:
-      summary: Create a PCB board
-      security:
-        - bearerAuth: []
-      responses:
-        '201':
-          description: Created
-
-  /api/v1/ai/chats:
-    get:
-      summary: List AI chats
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: OK
-    post:
-      summary: Create AI chat
-      security:
-        - bearerAuth: []
-      responses:
-        '201':
-          description: Created
-
-  /api/v1/ai/chats/{chat_id}/messages:
-    post:
-      summary: Send message to AI assistant
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: OK
-
-  /ws/projects/{project_id}:
-    get:
-      summary: Project real-time stream
-      responses:
-        '101':
-          description: Switching Protocols
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-```
-
-## 6. Component design
-
-### Core React components
-
-```ts
-interface ChatPanelProps {
-  chatId: string;
-  messages: Message[];
-  onSendMessage: (content: string) => Promise<void>;
-  isStreaming: boolean;
-}
-
-function ChatPanel({ chatId, messages, onSendMessage, isStreaming }: ChatPanelProps) {
-  return <div className="chat-panel" />;
-}
-```
-
-### Recommended hooks
-
-- useCADEditor: editor state, commands, selection, viewport
-- useSelection: selection management and derived properties
-- useUndo: command history and redo/undo
-- useSnapping: coordinate snapping and constraint guidance
-- useAIAssistant: chat state, streaming responses, tool invocation
-
-### UI module boundaries
-
-- Auth and onboarding remain in shared shell
-- CAD, PCB, and AI modules own their local state and APIs
-- Cross-module orchestration happens via composition and shared services
-
-## 7. Service layer
-
-### Core services
-
-```python
-class AuthService:
-    async def register(self, email: str, password: str, name: str) -> User:
-        raise NotImplementedError
-
-    async def login(self, email: str, password: str) -> dict:
-        raise NotImplementedError
-
-    async def refresh_token(self, refresh_token: str) -> dict:
-        raise NotImplementedError
-```
-
-```python
-class ProjectService:
-    async def create_project(self, payload: dict, user: User) -> Project:
-        raise NotImplementedError
-
-    async def share_project(self, project_id: UUID, user_ids: list[UUID]) -> None:
-        raise NotImplementedError
-```
-
-```python
-class CADService:
-    async def create_sketch(self, project_id: UUID, body: dict, user: User) -> dict:
-        raise NotImplementedError
-
-    async def extrude(self, sketch_id: UUID, body: dict) -> dict:
-        raise NotImplementedError
-```
-
-```python
-class PCBService:
-    async def create_board(self, project_id: UUID, payload: dict, user: User) -> dict:
-        raise NotImplementedError
-
-    async def place_component(self, board_id: UUID, payload: dict) -> dict:
-        raise NotImplementedError
-```
-
-### Error handling expectations
-
-- Domain errors return structured 4xx/5xx codes
-- All services log correlation IDs
-- Background jobs emit events and retry policies
-- Business rules are validated before writes to the main database
-
-## 8. AI architecture
+## 5. AI architecture
 
 ### Provider abstraction
 
-```python
-class AIProvider(Enum):
-    OPENAI = "openai"
-    ANTHROPIC = "anthropic"
-    GEMINI = "gemini"
-    OLLAMA = "ollama"
-    GROQ = "groq"
-    TOGETHER = "together"
-    OPENROUTER = "openrouter"
-```
+- The AI layer uses a provider-aware router with fallback logic, cost controls, token tracking, and per-tenant configuration.
+- Supported providers include OpenAI, Anthropic, Gemini, Ollama, Groq, Together, and OpenRouter.
+- Routing considers latency, budget, model capability, and data residency policies.
 
-### Agent definitions
+### Agent system
 
-- PlannerAgent
-  - Input: user request and project context
-  - Output: subtask plan with assigned specialized agent
-  - Uses intent classification and retrieval
+- PlannerAgent breaks high-level requests into work items.
+- MechanicalCADAgent creates parametric features and geometry operations.
+- PCBDesignAgent suggests layouts and routing heuristics.
+- ElectronicsAgent evaluates circuits and component compatibility.
+- SimulationAgent executes FEA, SPICE, or motion analysis jobs.
+- FirmwareAgent writes embedded C/C++ or Rust code.
+- ManufacturingAgent estimates BOM cost and assembly feasibility.
+- DesignReviewAgent performs QA, DRC, and release checks.
+- DocumentationAgent creates design notes, user guides, and manufacturing handoffs.
 
-- MechanicalCADAgent
-  - Handles sketching, feature creation, parametric modeling
-  - Executes CAD tools such as create_sketch, extrude, fillet
+### Tool system
 
-- PCBDesignAgent
-  - Handles component placement, routing suggestions, DRC checks
-  - Executes place_component, route_trace, run_drc
+- Agents call typed tools for CAD edits, PCB placement, file access, datasheet search, export operations, and project context retrieval.
+- Tools are registered centrally and executed with permission checks and audit logging.
 
-- ElectronicsAgent
-  - Reviews circuits, suggests parts, analyzes topology
-  - Uses datasheet and standards retrieval
+### RAG
 
-- SimulationAgent
-  - Runs FEA, SPICE, motion, thermal analyses as async jobs
+- Vector search over datasheets, standards, internal documents, and component knowledge is stored in Qdrant.
+- Embeddings are refreshed on document ingestion and versioned by project and tenant.
 
-- FirmwareAgent
-  - Generates embedded code and board support packages
+## 6. Deployment architecture
 
-- ManufacturingAgent
-  - Selects materials, estimates cost, plans fabrication steps
+### Containerization
 
-- DesignReviewAgent
-  - Checks compliance, safety, manufacturability, and quality
+- Backend services are deployed as FastAPI instances behind a load balancer.
+- Frontend is served by a Next.js origin and optionally a CDN cache.
+- Async workers process export, simulation, and AI jobs through Celery and RabbitMQ.
+- PostgreSQL, Redis, RabbitMQ, object storage, and a vector database form the data plane.
 
-- DocumentationAgent
-  - Produces design notes, BOM summaries, and release docs
+### Production targets
 
-### Tool registry example
+- 3+ backend replicas per region.
+- Autoscaling on CPU, queue depth, and WebSocket connection count.
+- Health checks and readiness probes for zero-downtime deploys.
+- Centralized logging, tracing, metrics, and alerts through OpenTelemetry and Prometheus/Grafana.
 
-```python
-tool_registry = {
-    "create_sketch": CreateSketchTool(),
-    "extrude": ExtrudeTool(),
-    "place_component": PlaceComponentTool(),
-    "search_datasheets": SearchDatasheetsTool(),
-}
-```
+## 7. Security architecture
 
-### RAG workflow
+- JWT access tokens and refresh tokens with rotation and short expiration windows.
+- CSRF protections for browser requests and signed file URLs for object storage access.
+- Encryption at rest for API keys and secrets using KMS-managed keys.
+- Role-based access control at organization, project, and artifact levels.
+- Audit logging for login, create, update, delete, share, and export actions.
 
-1. Ingest datasheets, standards, application notes, and internal documentation
-2. Generate embeddings and store them in Qdrant
-3. Retrieve top-k results for each user request
-4. Inject retrieved context into the agent graph for grounded responses
-
-## 9. Deployment architecture
-
-### Docker compose
-
-Use the compose file in [docker-compose.yml](docker-compose.yml).
-
-### Kubernetes considerations
-
-- Backend deployment with 3 replicas and autoscaling
-- Frontend deployment with CDN-backed static assets
-- PostgreSQL, Redis, RabbitMQ, and object storage managed separately in production
-- Health checks, readiness probes, and pod anti-affinity for resilience
-
-## 10. Security architecture
-
-### Authentication and authorization
-
-- JWT access tokens with refresh token rotation
-- OAuth for Google and GitHub
-- RBAC: owner/admin/member/viewer
-- Protected routes require authenticated context
-
-### Data security
-
-- Encrypt API keys at rest using a KMS-backed secret store
-- TLS everywhere
-- Per-domain CORS policy
-- Rate limiting and WAF rules
-- Audit events for every mutating action
-
-### Audit logging
-
-```python
-async def log_audit(user_id: UUID, action: str, resource_id: UUID, details: dict):
-    audit_log = AuditLog(
-        user_id=user_id,
-        action=action,
-        resource_id=resource_id,
-        details=details,
-        ip_address=request.client.host,
-    )
-    db.add(audit_log)
-    await db.commit()
-```
-
-## 11. Development roadmap
+## 8. Delivery roadmap
 
 ### Phase 1 — Foundation
 
-- Monorepo structure and project conventions
-- PostgreSQL, Redis, RabbitMQ, object storage
-- Authentication, API scaffolding, frontend shell
+- repository scaffold, database migrations, auth, baseline API, web shell
 
 ### Phase 2 — Core editors
 
-- 2D CAD and PCB schematic editing
-- 3D viewport and basic assemblies
-- File management and versioning
-- Real-time collaboration via Yjs and WebSocket
+- 2D CAD, 3D viewport, PCB schematic, real-time sync, file management
 
-### Phase 3 — AI system
+### Phase 3 — AI platform
 
-- Multi-provider LLM router
-- LangGraph agents
-- Tool registry and RAG
-- Agent memory and usage tracking
+- model router, LangGraph agents, RAG, tool registry, streaming responses
 
-### Phase 4 — Advanced engineering workflows
+### Phase 4 — Advanced engineering
 
-- Simulation, manufacturing planning, firmware generation
-- Advanced PCB layout automation and design rule checks
-- BOM generation and release documentation
+- simulation, firmware generation, assembly modeling, advanced PCB rules
 
 ### Phase 5 — Production hardening
 
-- Load testing, SRE monitoring, security review
-- Kubernetes rollout, autoscaling, disaster recovery
-- Compliance, observability, and enterprise support
-
-## Quality gates
-
-- Unit test coverage above 80%
-- Integration tests for all primary APIs
-- Load tests for 1,000 concurrent users
-- Security review aligned to OWASP Top 10
-- P95 latency budgets and uptime monitoring
-- Documentation reviewed before release
+- performance tuning, SLO monitoring, security audits, cost controls, and compliance

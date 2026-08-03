@@ -15,6 +15,7 @@ spec:
       containers:
         - name: backend
           image: enginex-backend:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           env:
@@ -28,6 +29,23 @@ spec:
                 configMapKeyRef:
                   name: enginex-config
                   key: redis-url
+            - name: RABBITMQ_URL
+              valueFrom:
+                secretKeyRef:
+                  name: enginex-secrets
+                  key: rabbitmq-url
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 20
           resources:
             requests:
               memory: "256Mi"
@@ -46,3 +64,20 @@ spec:
   ports:
     - port: 80
       targetPort: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: enginex-backend
+spec:
+  rules:
+    - host: api.enginex.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: enginex-backend
+                port:
+                  number: 80

@@ -5,6 +5,11 @@ This directory contains a production-grade architecture blueprint for Enginex AI
 ## Deliverables
 
 - [Complete architecture overview](complete-architecture.md)
+- [Component design](component-design.md)
+- [Service layer](service-layer.md)
+- [AI agent definitions](ai-agents.md)
+- [Security architecture](security-architecture.md)
+- [Development roadmap](roadmap.md)
 - [Database schema](database-schema.sql)
 - [API specification](api-spec.yaml)
 - [Local development compose file](docker-compose.yml)

@@ -2,111 +2,615 @@ openapi: 3.0.3
 info:
   title: Enginex AI API
   version: 1.0.0
+  description: Production API contract for the Enginex AI platform.
 servers:
   - url: https://api.enginex.ai
+  - url: http://localhost:8000
 paths:
   /api/v1/auth/register:
     post:
-      summary: Register a user
+      summary: Register a new user
+      tags: [Authentication]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [email, password, name]
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
-                name:
-                  type: string
+              $ref: '#/components/schemas/RegisterRequest'
       responses:
         '201':
-          description: Created
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
 
   /api/v1/auth/login:
     post:
-      summary: Login a user
+      summary: Authenticate a user
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: OK
+          description: Access token issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /api/v1/auth/refresh:
+    post:
+      summary: Refresh an access token
+      tags: [Authentication]
+      responses:
+        '200':
+          description: Refreshed
+
+  /api/v1/auth/logout:
+    post:
+      summary: Revoke a session
+      tags: [Authentication]
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Logged out
 
   /api/v1/projects:
     get:
       summary: List projects
+      tags: [Projects]
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Project list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
     post:
-      summary: Create project
+      summary: Create a project
+      tags: [Projects]
       security:
         - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectRequest'
       responses:
         '201':
-          description: Created
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+
+  /api/v1/projects/{project_id}:
+    get:
+      summary: Get project details
+      tags: [Projects]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Project details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+    put:
+      summary: Update a project
+      tags: [Projects]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Project updated
+
+  /api/v1/projects/{project_id}/share:
+    post:
+      summary: Share a project with a team
+      tags: [Projects]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Share operation accepted
 
   /api/v1/projects/{project_id}/cad/sketch:
     post:
       summary: Create a CAD sketch
+      tags: [CAD]
       security:
         - bearerAuth: []
       parameters:
-        - in: path
-          name: project_id
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSketchRequest'
       responses:
         '201':
-          description: Created
+          description: Sketch created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CADSketch'
+
+  /api/v1/projects/{project_id}/cad/sketches:
+    get:
+      summary: List sketches for a project
+      tags: [CAD]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Sketches
+
+  /api/v1/cad/sketches/{sketch_id}/extrude:
+    post:
+      summary: Extrude a sketch
+      tags: [CAD]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SketchId'
+      responses:
+        '201':
+          description: Body created
+
+  /api/v1/cad/bodies/{body_id}:
+    get:
+      summary: Get a CAD body
+      tags: [CAD]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BodyId'
+      responses:
+        '200':
+          description: Body details
+
+  /api/v1/cad/export/step:
+    post:
+      summary: Export a CAD model to STEP
+      tags: [CAD]
+      security:
+        - bearerAuth: []
+      responses:
+        '202':
+          description: Export queued
+
+  /api/v1/cad/export/stl:
+    post:
+      summary: Export a CAD model to STL
+      tags: [CAD]
+      security:
+        - bearerAuth: []
+      responses:
+        '202':
+          description: Export queued
 
   /api/v1/projects/{project_id}/pcb/board:
     post:
       summary: Create a PCB board
+      tags: [PCB]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '201':
+          description: PCB board created
+
+  /api/v1/pcb/boards/{board_id}/component:
+    post:
+      summary: Place a PCB component
+      tags: [PCB]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BoardId'
+      responses:
+        '201':
+          description: Component placed
+
+  /api/v1/pcb/boards/{board_id}/route:
+    post:
+      summary: Route a PCB board
+      tags: [PCB]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BoardId'
+      responses:
+        '202':
+          description: Routing started
+
+  /api/v1/pcb/boards/{board_id}/drc:
+    post:
+      summary: Run PCB design rule checks
+      tags: [PCB]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BoardId'
+      responses:
+        '200':
+          description: DRC results
+
+  /api/v1/pcb/boards/{board_id}/bom:
+    post:
+      summary: Generate a BOM for a PCB board
+      tags: [PCB]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BoardId'
+      responses:
+        '200':
+          description: BOM generated
+
+  /api/v1/pcb/export/gerber:
+    post:
+      summary: Export PCB Gerber files
+      tags: [PCB]
       security:
         - bearerAuth: []
       responses:
+        '202':
+          description: Export queued
+
+  /api/v1/pcb/export/centroid:
+    post:
+      summary: Export PCB centroid data
+      tags: [PCB]
+      security:
+        - bearerAuth: []
+      responses:
+        '202':
+          description: Export queued
+
+  /api/v1/projects/{project_id}/ai/chats:
+    get:
+      summary: List AI chats for a project
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Chats listed
+    post:
+      summary: Create an AI chat
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
         '201':
-          description: Created
+          description: Chat created
 
   /api/v1/ai/chats:
-    get:
-      summary: List AI chats
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: OK
     post:
-      summary: Create AI chat
+      summary: Create a standalone AI chat
+      tags: [AI]
       security:
         - bearerAuth: []
       responses:
         '201':
-          description: Created
+          description: Chat created
 
   /api/v1/ai/chats/{chat_id}/messages:
+    get:
+      summary: Fetch chat history
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ChatId'
+      responses:
+        '200':
+          description: Message history
     post:
       summary: Send a message to the AI assistant
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ChatId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessageRequest'
+      responses:
+        '200':
+          description: AI response
+
+  /api/v1/ai/providers/configure:
+    post:
+      summary: Configure an AI provider
+      tags: [AI]
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: OK
+          description: Provider configured
+
+  /api/v1/ai/providers:
+    get:
+      summary: List configured providers
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Providers listed
+
+  /api/v1/ai/agents:
+    get:
+      summary: List available agents
+      tags: [AI]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Agents listed
+
+  /api/v1/projects/{project_id}/files:
+    get:
+      summary: List project files
+      tags: [Files]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Files listed
+
+  /api/v1/files/upload:
+    post:
+      summary: Upload a file to object storage
+      tags: [Files]
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: File uploaded
+
+  /api/v1/files/{file_id}/download:
+    get:
+      summary: Download a file
+      tags: [Files]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+      responses:
+        '200':
+          description: File returned
+
+  /api/v1/files/{file_id}:
+    delete:
+      summary: Delete a file
+      tags: [Files]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+      responses:
+        '204':
+          description: File deleted
+
+  /api/v1/users/me:
+    get:
+      summary: Get current user
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user payload
+    put:
+      summary: Update current user
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User updated
+
+  /api/v1/users/{user_id}:
+    get:
+      summary: Get a public user profile
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: Public profile
 
   /ws/projects/{project_id}:
     get:
       summary: Real-time project updates
+      tags: [WebSocket]
       responses:
         '101':
           description: Switching Protocols
+
+  /ws/ai/chats/{chat_id}:
+    get:
+      summary: Stream AI responses
+      tags: [WebSocket]
+      responses:
+        '101':
+          description: Switching Protocols
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  parameters:
+    ProjectId:
+      in: path
+      name: project_id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SketchId:
+      in: path
+      name: sketch_id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    BodyId:
+      in: path
+      name: body_id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    BoardId:
+      in: path
+      name: board_id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ChatId:
+      in: path
+      name: chat_id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    FileId:
+      in: path
+      name: file_id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    UserId:
+      in: path
+      name: user_id
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [email, password, name]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 12
+        name:
+          type: string
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        token_type:
+          type: string
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+    CreateProjectRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+    CreateSketchRequest:
+      type: object
+      required: [name, plane]
+      properties:
+        name:
+          type: string
+        plane:
+          type: string
+        dimensions:
+          type: object
+    CADSketch:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        plane:
+          type: string
+    ChatMessageRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: string
