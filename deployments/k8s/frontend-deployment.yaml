@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enginex-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: enginex-frontend
+  template:
+    metadata:
+      labels:
+        app: enginex-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: enginex-frontend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: https://api.enginex.ai
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: enginex-frontend
+spec:
+  selector:
+    app: enginex-frontend
+  ports:
+    - port: 80
+      targetPort: 3000

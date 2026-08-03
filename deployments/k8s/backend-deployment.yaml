@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enginex-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: enginex-backend
+  template:
+    metadata:
+      labels:
+        app: enginex-backend
+    spec:
+      containers:
+        - name: backend
+          image: enginex-backend:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: enginex-secrets
+                  key: database-url
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enginex-config
+                  key: redis-url
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: enginex-backend
+spec:
+  selector:
+    app: enginex-backend
+  ports:
+    - port: 80
+      targetPort: 8000

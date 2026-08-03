@@ -1,0 +1,112 @@
+openapi: 3.0.3
+info:
+  title: Enginex AI API
+  version: 1.0.0
+servers:
+  - url: https://api.enginex.ai
+paths:
+  /api/v1/auth/register:
+    post:
+      summary: Register a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Created
+
+  /api/v1/auth/login:
+    post:
+      summary: Login a user
+      responses:
+        '200':
+          description: OK
+
+  /api/v1/projects:
+    get:
+      summary: List projects
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create project
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Created
+
+  /api/v1/projects/{project_id}/cad/sketch:
+    post:
+      summary: Create a CAD sketch
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: project_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Created
+
+  /api/v1/projects/{project_id}/pcb/board:
+    post:
+      summary: Create a PCB board
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Created
+
+  /api/v1/ai/chats:
+    get:
+      summary: List AI chats
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create AI chat
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Created
+
+  /api/v1/ai/chats/{chat_id}/messages:
+    post:
+      summary: Send a message to the AI assistant
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+
+  /ws/projects/{project_id}:
+    get:
+      summary: Real-time project updates
+      responses:
+        '101':
+          description: Switching Protocols
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
