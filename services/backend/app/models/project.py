@@ -1,6 +1,7 @@
 import uuid
+from datetime import datetime
 
-from sqlalchemy import JSON, ForeignKey, String, Text
+from sqlalchemy import JSON, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -25,6 +26,7 @@ class Project(Base, UUIDPKMixin, TimestampMixin):
     type: Mapped[str] = mapped_column(String(20), nullable=False, default="mixed")
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="active")
     settings: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    members: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 
 
 class Folder(Base, UUIDPKMixin):
@@ -37,3 +39,6 @@ class Folder(Base, UUIDPKMixin):
         UUID(as_uuid=True), ForeignKey("folders.id", ondelete="CASCADE"), nullable=True
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )

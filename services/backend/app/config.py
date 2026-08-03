@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     rabbitmq_url: str = "amqp://guest:guest@localhost:5672"
 
     # Object storage
+    storage_backend: str = "local"  # "local" or "s3"
+    storage_root: str = "./storage"
+    max_upload_size_bytes: int = 100 * 1024 * 1024
+
     s3_endpoint: str = "http://localhost:9000"
     s3_access_key: str = "minioadmin"
     s3_secret_key: str = "minioadmin"

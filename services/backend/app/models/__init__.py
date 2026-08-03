@@ -1,10 +1,14 @@
 from app.models.ai_chat import AgentMemory, AIAgent, AIChat, AIMessage
 from app.models.api_key import APIKey
 from app.models.cad_object import CADObject
+from app.models.collab import YDocSnapshot
+from app.models.component import Component, Footprint, Symbol
 from app.models.file import File
+from app.models.file_version import FileVersion
 from app.models.organization import Organization, Team
 from app.models.pcb_board import Layer, PCBBoard, PCBComponent
 from app.models.project import Folder, Project
+from app.models.simulation import SimulationJob
 from app.models.subscription import Subscription
 from app.models.usage_log import AuditLog, UsageLog
 from app.models.user import User
@@ -16,6 +20,7 @@ __all__ = [
     "Project",
     "Folder",
     "File",
+    "FileVersion",
     "CADObject",
     "PCBBoard",
     "PCBComponent",
@@ -28,4 +33,9 @@ __all__ = [
     "APIKey",
     "UsageLog",
     "AuditLog",
+    "Symbol",
+    "Footprint",
+    "Component",
+    "SimulationJob",
+    "YDocSnapshot",
 ]

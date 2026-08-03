@@ -1,11 +1,24 @@
+import tempfile
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from app.config import settings
 from app.database import Base, get_db
 from app.main import app
+from app.services.storage import get_storage
+
+
+@pytest.fixture(autouse=True)
+def isolated_storage(monkeypatch, tmp_path_factory):
+    storage_root = tmp_path_factory.mktemp("storage")
+    monkeypatch.setattr(settings, "storage_root", str(storage_root))
+    get_storage.cache_clear()
+    yield storage_root
+    get_storage.cache_clear()
 
 
 @pytest.fixture()

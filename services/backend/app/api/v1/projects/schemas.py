@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class CreateProjectRequest(BaseModel):
@@ -31,3 +31,20 @@ class ProjectOut(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ShareProjectRequest(BaseModel):
+    user_id: uuid.UUID
+    role: str = Field(default="viewer", pattern="^(owner|editor|viewer)$")
+
+
+class InviteProjectRequest(BaseModel):
+    email: EmailStr
+    role: str = Field(default="viewer", pattern="^(owner|editor|viewer)$")
+
+
+class ProjectMemberOut(BaseModel):
+    user_id: uuid.UUID
+    email: str
+    name: str
+    role: str
