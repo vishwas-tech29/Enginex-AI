@@ -1,9 +1,9 @@
 import uuid
 
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.v1.teams.schemas import AddTeamMemberRequest, UpdateTeamRequest
+from app.core.exceptions import ForbiddenError, NotFoundError
 from app.models.organization import Organization, Team
 from app.models.user import User
 
@@ -15,10 +15,10 @@ class TeamService:
     def _get_with_access(self, team_id: uuid.UUID, user: User) -> Team:
         team = self.db.get(Team, team_id)
         if not team:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "Team not found")
+            raise NotFoundError("Team", team_id)
         org = self.db.get(Organization, team.organization_id)
         if not org or org.owner_id != user.id:
-            raise HTTPException(status.HTTP_403_FORBIDDEN, "Insufficient permissions on this team")
+            raise ForbiddenError("Insufficient permissions on this team")
         return team
 
     def get(self, team_id: uuid.UUID, user: User) -> Team:
@@ -36,7 +36,7 @@ class TeamService:
         team = self._get_with_access(team_id, user)
         target = self.db.get(User, payload.user_id)
         if not target:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found")
+            raise NotFoundError("User", payload.user_id)
 
         members = [m for m in team.members if m.get("user_id") != str(payload.user_id)]
         members.append({"user_id": str(payload.user_id), "role": payload.role})
