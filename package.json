@@ -26,5 +26,10 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "pnpm": {
+    "overrides": {
+      "canvas": "file:./vendor/canvas-stub"
+    }
+  }
 }

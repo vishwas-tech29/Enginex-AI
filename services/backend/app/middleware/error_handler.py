@@ -14,7 +14,7 @@ def register_error_handlers(app: FastAPI) -> None:
     async def enginex_exception_handler(request: Request, exc: EngineXException):
         logger.error(
             "enginex_exception",
-            extra={"code": exc.code, "message": exc.message, "path": request.url.path},
+            extra={"code": exc.code, "error_message": exc.message, "path": request.url.path},
         )
         return JSONResponse(
             status_code=exc.status_code,

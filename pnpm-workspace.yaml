@@ -1,3 +1,11 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# jsdom (via jest-environment-jsdom) and fabric.js both list the native
+# `canvas` package as an optional peer for real canvas-pixel rendering.
+# Nothing here needs that, and node-canvas's node-gyp build isn't portable
+# across dev machines without a full native toolchain — see
+# vendor/canvas-stub and apps/web/__mocks__/canvas.js.
+overrides:
+  canvas: "file:./vendor/canvas-stub"

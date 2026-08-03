@@ -11,7 +11,7 @@ This directory contains a production-grade architecture blueprint for Enginex AI
 - [Security architecture](security-architecture.md)
 - [Development roadmap](roadmap.md)
 - [Database schema](database-schema.sql)
-- [API specification](api-spec.yaml)
+- [API specification](api-spec.yaml) — auto-exported from the live FastAPI schema (`python -m app.scripts.export_openapi`), not hand-maintained
 - [Local development compose file](docker-compose.yml)
 - [Kubernetes manifests](../../deployments/k8s/)
 

@@ -26,3 +26,19 @@ class ConflictError(EngineXException):
 class ValidationError(EngineXException):
     def __init__(self, field: str, message: str):
         super().__init__(f"Validation failed for field '{field}': {message}", "VALIDATION_ERROR", 422)
+
+
+class EngineNotImplementedError(EngineXException):
+    """Raised by endpoints whose geometry/routing/simulation engine doesn't exist yet.
+
+    The API contract (route, auth, schema) is real; the computation behind it
+    is future work per docs/architecture/roadmap.md.
+    """
+
+    def __init__(self, operation: str):
+        super().__init__(
+            f"'{operation}' is not implemented yet — the engine behind this "
+            "endpoint lands in a later phase (see docs/architecture/roadmap.md)",
+            "NOT_IMPLEMENTED",
+            501,
+        )

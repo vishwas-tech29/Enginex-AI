@@ -1,6 +1,7 @@
 import { FormEvent, useMemo, useState } from 'react';
 
 import { Button } from '@/components/common/Button';
+import { useDefaultOrganization } from '@/hooks/useDefaultOrganization';
 import { useProject } from '@/hooks/useProject';
 import type { ProjectType } from '@/types/models';
 
@@ -10,6 +11,7 @@ interface CreateProjectFormProps {
 
 export function CreateProjectForm({ onSuccess }: CreateProjectFormProps) {
   const { createProject } = useProject();
+  const { organizationId, isLoading: isLoadingOrg } = useDefaultOrganization();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState<ProjectType>('cad');
@@ -26,11 +28,15 @@ export function CreateProjectForm({ onSuccess }: CreateProjectFormProps) {
       setError('Project name must be at least 2 characters long.');
       return;
     }
+    if (!organizationId) {
+      setError('Still setting up your workspace — try again in a moment.');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
       await createProject({
-        organization_id: 'default-org',
+        organization_id: organizationId,
         name,
         description,
         type,
@@ -80,7 +86,7 @@ export function CreateProjectForm({ onSuccess }: CreateProjectFormProps) {
         </select>
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      <Button type="submit" isLoading={isSubmitting} className="w-full">
+      <Button type="submit" isLoading={isSubmitting} disabled={isLoadingOrg} className="w-full">
         Create project
       </Button>
     </form>

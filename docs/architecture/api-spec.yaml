@@ -1,616 +1,3930 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Enginex AI API
   version: 1.0.0
-  description: Production API contract for the Enginex AI platform.
-servers:
-  - url: https://api.enginex.ai
-  - url: http://localhost:8000
+  description: Auto-generated from the FastAPI app (see app/scripts/export_openapi.py) — this is the same
+    schema served live at /openapi.json. WebSocket endpoints (/ws/files/{file_id}) aren't representable
+    in OpenAPI 3.0 and are documented separately in docs/architecture/complete-architecture.md and services/backend/app/websockets/manager.py.
 paths:
   /api/v1/auth/register:
     post:
-      summary: Register a new user
-      tags: [Authentication]
+      tags:
+      - Authentication
+      summary: Register
+      operationId: register_api_v1_auth_register_post
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RegisterRequest'
+        required: true
       responses:
         '201':
-          description: User created successfully
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-
+                $ref: '#/components/schemas/TokenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/auth/login:
     post:
-      summary: Authenticate a user
-      tags: [Authentication]
+      tags:
+      - Authentication
+      summary: Login
+      operationId: login_api_v1_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/auth/refresh:
+    post:
+      tags:
+      - Authentication
+      summary: Refresh
+      operationId: refresh_api_v1_auth_refresh_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/auth/logout:
+    post:
+      tags:
+      - Authentication
+      summary: Logout
+      operationId: logout_api_v1_auth_logout_post
+      responses:
+        '204':
+          description: Successful Response
+      security:
+      - HTTPBearer: []
+  /api/v1/auth/me:
+    get:
+      tags:
+      - Authentication
+      summary: Me
+      operationId: me_api_v1_auth_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__api__v1__auth__schemas__UserOut'
+      security:
+      - HTTPBearer: []
+  /api/v1/users/me:
+    get:
+      tags:
+      - Users
+      summary: Get Me
+      operationId: get_me_api_v1_users_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__api__v1__users__schemas__UserOut'
+      security:
+      - HTTPBearer: []
+    patch:
+      tags:
+      - Users
+      summary: Update Me
+      operationId: update_me_api_v1_users_me_patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__api__v1__users__schemas__UserOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/organizations:
+    get:
+      tags:
+      - Organizations
+      summary: List Organizations
+      operationId: list_organizations_api_v1_organizations_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/OrganizationOut'
+                type: array
+                title: Response List Organizations Api V1 Organizations Get
+      security:
+      - HTTPBearer: []
+    post:
+      tags:
+      - Organizations
+      summary: Create Organization
+      operationId: create_organization_api_v1_organizations_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/organizations/{org_id}:
+    get:
+      tags:
+      - Organizations
+      summary: Get Organization
+      operationId: get_organization_api_v1_organizations__org_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: org_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Org Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Organizations
+      summary: Update Organization
+      operationId: update_organization_api_v1_organizations__org_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: org_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Org Id
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: '#/components/schemas/UpdateOrganizationRequest'
       responses:
         '200':
-          description: Access token issued
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-
-  /api/v1/auth/refresh:
-    post:
-      summary: Refresh an access token
-      tags: [Authentication]
-      responses:
-        '200':
-          description: Refreshed
-
-  /api/v1/auth/logout:
-    post:
-      summary: Revoke a session
-      tags: [Authentication]
-      security:
-        - bearerAuth: []
-      responses:
-        '204':
-          description: Logged out
-
-  /api/v1/projects:
+                $ref: '#/components/schemas/OrganizationOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/organizations/{org_id}/teams:
     get:
-      summary: List projects
-      tags: [Projects]
+      tags:
+      - Organizations
+      summary: List Teams
+      operationId: list_teams_api_v1_organizations__org_id__teams_get
       security:
-        - bearerAuth: []
+      - HTTPBearer: []
+      parameters:
+      - name: org_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Org Id
       responses:
         '200':
-          description: Project list
+          description: Successful Response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Project'
+                  $ref: '#/components/schemas/TeamOut'
+                title: Response List Teams Api V1 Organizations  Org Id  Teams Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
     post:
-      summary: Create a project
-      tags: [Projects]
+      tags:
+      - Organizations
+      summary: Create Team
+      operationId: create_team_api_v1_organizations__org_id__teams_post
       security:
-        - bearerAuth: []
+      - HTTPBearer: []
+      parameters:
+      - name: org_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Org Id
       requestBody:
         required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/teams/{team_id}:
+    get:
+      tags:
+      - Teams
+      summary: Get Team
+      operationId: get_team_api_v1_teams__team_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Team Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Teams
+      summary: Update Team
+      operationId: update_team_api_v1_teams__team_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Team Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTeamRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/teams/{team_id}/members:
+    post:
+      tags:
+      - Teams
+      summary: Add Member
+      operationId: add_member_api_v1_teams__team_id__members_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Team Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTeamMemberRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/teams/{team_id}/members/{user_id}:
+    delete:
+      tags:
+      - Teams
+      summary: Remove Member
+      operationId: remove_member_api_v1_teams__team_id__members__user_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Team Id
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/projects:
+    get:
+      tags:
+      - Projects
+      summary: List Projects
+      operationId: list_projects_api_v1_projects_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ProjectOut'
+                type: array
+                title: Response List Projects Api V1 Projects Get
+      security:
+      - HTTPBearer: []
+    post:
+      tags:
+      - Projects
+      summary: Create Project
+      operationId: create_project_api_v1_projects_post
+      requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateProjectRequest'
+        required: true
       responses:
         '201':
-          description: Project created
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Project'
-
+                $ref: '#/components/schemas/ProjectOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
   /api/v1/projects/{project_id}:
     get:
-      summary: Get project details
-      tags: [Projects]
+      tags:
+      - Projects
+      summary: Get Project
+      operationId: get_project_api_v1_projects__project_id__get
       security:
-        - bearerAuth: []
+      - HTTPBearer: []
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
       responses:
         '200':
-          description: Project details
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Project'
-    put:
-      summary: Update a project
-      tags: [Projects]
+                $ref: '#/components/schemas/ProjectOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - Projects
+      summary: Update Project
+      operationId: update_project_api_v1_projects__project_id__patch
       security:
-        - bearerAuth: []
+      - HTTPBearer: []
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
-      responses:
-        '200':
-          description: Project updated
-
-  /api/v1/projects/{project_id}/share:
-    post:
-      summary: Share a project with a team
-      tags: [Projects]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-      responses:
-        '200':
-          description: Share operation accepted
-
-  /api/v1/projects/{project_id}/cad/sketch:
-    post:
-      summary: Create a CAD sketch
-      tags: [CAD]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
       requestBody:
         required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Projects
+      summary: Delete Project
+      operationId: delete_project_api_v1_projects__project_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/projects/{project_id}/members:
+    get:
+      tags:
+      - Projects
+      summary: List Members
+      operationId: list_members_api_v1_projects__project_id__members_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectMemberOut'
+                title: Response List Members Api V1 Projects  Project Id  Members Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/projects/{project_id}/share:
+    post:
+      tags:
+      - Projects
+      summary: Share Project
+      operationId: share_project_api_v1_projects__project_id__share_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShareProjectRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectMemberOut'
+                title: Response Share Project Api V1 Projects  Project Id  Share Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/projects/{project_id}/invite:
+    post:
+      tags:
+      - Projects
+      summary: Invite To Project
+      operationId: invite_to_project_api_v1_projects__project_id__invite_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteProjectRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectMemberOut'
+                title: Response Invite To Project Api V1 Projects  Project Id  Invite Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/projects/{project_id}/files:
+    get:
+      tags:
+      - Projects
+      summary: List Project Files
+      operationId: list_project_files_api_v1_projects__project_id__files_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileOut'
+                title: Response List Project Files Api V1 Projects  Project Id  Files Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/projects/{project_id}/folders:
+    get:
+      tags:
+      - Folders
+      summary: List Folders
+      operationId: list_folders_api_v1_projects__project_id__folders_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FolderOut'
+                title: Response List Folders Api V1 Projects  Project Id  Folders Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Folders
+      summary: Create Folder
+      operationId: create_folder_api_v1_projects__project_id__folders_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Project Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFolderRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolderOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/folders/{folder_id}:
+    get:
+      tags:
+      - Folders
+      summary: Get Folder
+      operationId: get_folder_api_v1_folders__folder_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: folder_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Folder Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolderOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Folders
+      summary: Update Folder
+      operationId: update_folder_api_v1_folders__folder_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: folder_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Folder Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFolderRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolderOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Folders
+      summary: Delete Folder
+      operationId: delete_folder_api_v1_folders__folder_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: folder_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Folder Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/folders/{folder_id}/move:
+    post:
+      tags:
+      - Folders
+      summary: Move Folder
+      operationId: move_folder_api_v1_folders__folder_id__move_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: folder_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Folder Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveFolderRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolderOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/files/upload:
+    post:
+      tags:
+      - Files
+      summary: Upload File
+      operationId: upload_file_api_v1_files_upload_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_file_api_v1_files_upload_post'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/files/{file_id}:
+    get:
+      tags:
+      - Files
+      summary: Get File
+      operationId: get_file_api_v1_files__file_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: File Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Files
+      summary: Delete File
+      operationId: delete_file_api_v1_files__file_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: File Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/files/{file_id}/download:
+    get:
+      tags:
+      - Files
+      summary: Download File
+      operationId: download_file_api_v1_files__file_id__download_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: File Id
+      - name: version_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Version Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/files/{file_id}/versions:
+    get:
+      tags:
+      - Files
+      summary: List Versions
+      operationId: list_versions_api_v1_files__file_id__versions_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: File Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileVersionOut'
+                title: Response List Versions Api V1 Files  File Id  Versions Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/files/{file_id}/revert-to/{version_id}:
+    post:
+      tags:
+      - Files
+      summary: Revert To Version
+      operationId: revert_to_version_api_v1_files__file_id__revert_to__version_id__post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: File Id
+      - name: version_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Version Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/components:
+    get:
+      tags:
+      - Components & Libraries
+      summary: List Components
+      operationId: list_components_api_v1_components_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: category
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+      - name: skip
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+          title: Skip
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 100
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/app__api__v1__components__schemas__ComponentOut'
+                title: Response List Components Api V1 Components Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/components/search:
+    get:
+      tags:
+      - Components & Libraries
+      summary: Search Components
+      operationId: search_components_api_v1_components_search_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: q
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          title: Q
+      - name: category
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Category
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 50
+          title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/app__api__v1__components__schemas__ComponentOut'
+                title: Response Search Components Api V1 Components Search Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/components/{component_id}:
+    get:
+      tags:
+      - Components & Libraries
+      summary: Get Component
+      operationId: get_component_api_v1_components__component_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: component_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Component Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__api__v1__components__schemas__ComponentOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/components/{component_id}/datasheet:
+    get:
+      tags:
+      - Components & Libraries
+      summary: Get Datasheet
+      operationId: get_datasheet_api_v1_components__component_id__datasheet_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: component_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Component Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/symbols:
+    get:
+      tags:
+      - Components & Libraries
+      summary: List Symbols
+      operationId: list_symbols_api_v1_symbols_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: library
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Library
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SymbolOut'
+                title: Response List Symbols Api V1 Symbols Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Components & Libraries
+      summary: Create Symbol
+      operationId: create_symbol_api_v1_symbols_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSymbolRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SymbolOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/footprints:
+    get:
+      tags:
+      - Components & Libraries
+      summary: List Footprints
+      operationId: list_footprints_api_v1_footprints_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: package_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Package Type
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FootprintOut'
+                title: Response List Footprints Api V1 Footprints Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Components & Libraries
+      summary: Create Footprint
+      operationId: create_footprint_api_v1_footprints_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFootprintRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FootprintOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/simulation/jobs:
+    post:
+      tags:
+      - Simulation
+      summary: Create Job
+      operationId: create_job_api_v1_simulation_jobs_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSimulationJobRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulationJobOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/simulation/jobs/{job_id}:
+    get:
+      tags:
+      - Simulation
+      summary: Get Job
+      operationId: get_job_api_v1_simulation_jobs__job_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulationJobOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/simulation/jobs/{job_id}/cancel:
+    post:
+      tags:
+      - Simulation
+      summary: Cancel Job
+      operationId: cancel_job_api_v1_simulation_jobs__job_id__cancel_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulationJobOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/simulation/jobs/{job_id}/results:
+    get:
+      tags:
+      - Simulation
+      summary: Get Results
+      operationId: get_results_api_v1_simulation_jobs__job_id__results_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/simulation/jobs/{job_id}/report:
+    get:
+      tags:
+      - Simulation
+      summary: Get Report
+      operationId: get_report_api_v1_simulation_jobs__job_id__report_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/cad/sketches:
+    post:
+      tags:
+      - CAD
+      summary: Create Sketch
+      operationId: create_sketch_api_v1_cad_sketches_post
+      requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateSketchRequest'
+        required: true
       responses:
         '201':
-          description: Sketch created
+          description: Successful Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CADSketch'
-
-  /api/v1/projects/{project_id}/cad/sketches:
+                $ref: '#/components/schemas/CADObjectOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/cad/sketches/{sketch_id}:
     get:
-      summary: List sketches for a project
-      tags: [CAD]
+      tags:
+      - CAD
+      summary: Get Sketch
+      operationId: get_sketch_api_v1_cad_sketches__sketch_id__get
       security:
-        - bearerAuth: []
+      - HTTPBearer: []
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+      - name: sketch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Sketch Id
       responses:
         '200':
-          description: Sketches
-
-  /api/v1/cad/sketches/{sketch_id}/extrude:
-    post:
-      summary: Extrude a sketch
-      tags: [CAD]
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CADObjectOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - CAD
+      summary: Update Sketch
+      operationId: update_sketch_api_v1_cad_sketches__sketch_id__put
       security:
-        - bearerAuth: []
+      - HTTPBearer: []
       parameters:
-        - $ref: '#/components/parameters/SketchId'
-      responses:
-        '201':
-          description: Body created
-
-  /api/v1/cad/bodies/{body_id}:
-    get:
-      summary: Get a CAD body
-      tags: [CAD]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/BodyId'
-      responses:
-        '200':
-          description: Body details
-
-  /api/v1/cad/export/step:
-    post:
-      summary: Export a CAD model to STEP
-      tags: [CAD]
-      security:
-        - bearerAuth: []
-      responses:
-        '202':
-          description: Export queued
-
-  /api/v1/cad/export/stl:
-    post:
-      summary: Export a CAD model to STL
-      tags: [CAD]
-      security:
-        - bearerAuth: []
-      responses:
-        '202':
-          description: Export queued
-
-  /api/v1/projects/{project_id}/pcb/board:
-    post:
-      summary: Create a PCB board
-      tags: [PCB]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-      responses:
-        '201':
-          description: PCB board created
-
-  /api/v1/pcb/boards/{board_id}/component:
-    post:
-      summary: Place a PCB component
-      tags: [PCB]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/BoardId'
-      responses:
-        '201':
-          description: Component placed
-
-  /api/v1/pcb/boards/{board_id}/route:
-    post:
-      summary: Route a PCB board
-      tags: [PCB]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/BoardId'
-      responses:
-        '202':
-          description: Routing started
-
-  /api/v1/pcb/boards/{board_id}/drc:
-    post:
-      summary: Run PCB design rule checks
-      tags: [PCB]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/BoardId'
-      responses:
-        '200':
-          description: DRC results
-
-  /api/v1/pcb/boards/{board_id}/bom:
-    post:
-      summary: Generate a BOM for a PCB board
-      tags: [PCB]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/BoardId'
-      responses:
-        '200':
-          description: BOM generated
-
-  /api/v1/pcb/export/gerber:
-    post:
-      summary: Export PCB Gerber files
-      tags: [PCB]
-      security:
-        - bearerAuth: []
-      responses:
-        '202':
-          description: Export queued
-
-  /api/v1/pcb/export/centroid:
-    post:
-      summary: Export PCB centroid data
-      tags: [PCB]
-      security:
-        - bearerAuth: []
-      responses:
-        '202':
-          description: Export queued
-
-  /api/v1/projects/{project_id}/ai/chats:
-    get:
-      summary: List AI chats for a project
-      tags: [AI]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-      responses:
-        '200':
-          description: Chats listed
-    post:
-      summary: Create an AI chat
-      tags: [AI]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-      responses:
-        '201':
-          description: Chat created
-
-  /api/v1/ai/chats:
-    post:
-      summary: Create a standalone AI chat
-      tags: [AI]
-      security:
-        - bearerAuth: []
-      responses:
-        '201':
-          description: Chat created
-
-  /api/v1/ai/chats/{chat_id}/messages:
-    get:
-      summary: Fetch chat history
-      tags: [AI]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/ChatId'
-      responses:
-        '200':
-          description: Message history
-    post:
-      summary: Send a message to the AI assistant
-      tags: [AI]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/ChatId'
+      - name: sketch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Sketch Id
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChatMessageRequest'
+              $ref: '#/components/schemas/UpdateSketchRequest'
       responses:
         '200':
-          description: AI response
-
-  /api/v1/ai/providers/configure:
-    post:
-      summary: Configure an AI provider
-      tags: [AI]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Provider configured
-
-  /api/v1/ai/providers:
-    get:
-      summary: List configured providers
-      tags: [AI]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Providers listed
-
-  /api/v1/ai/agents:
-    get:
-      summary: List available agents
-      tags: [AI]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Agents listed
-
-  /api/v1/projects/{project_id}/files:
-    get:
-      summary: List project files
-      tags: [Files]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-      responses:
-        '200':
-          description: Files listed
-
-  /api/v1/files/upload:
-    post:
-      summary: Upload a file to object storage
-      tags: [Files]
-      security:
-        - bearerAuth: []
-      responses:
-        '201':
-          description: File uploaded
-
-  /api/v1/files/{file_id}/download:
-    get:
-      summary: Download a file
-      tags: [Files]
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/FileId'
-      responses:
-        '200':
-          description: File returned
-
-  /api/v1/files/{file_id}:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CADObjectOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
     delete:
-      summary: Delete a file
-      tags: [Files]
+      tags:
+      - CAD
+      summary: Delete Sketch
+      operationId: delete_sketch_api_v1_cad_sketches__sketch_id__delete
       security:
-        - bearerAuth: []
+      - HTTPBearer: []
       parameters:
-        - $ref: '#/components/parameters/FileId'
+      - name: sketch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Sketch Id
       responses:
         '204':
-          description: File deleted
-
-  /api/v1/users/me:
-    get:
-      summary: Get current user
-      tags: [Users]
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/cad/sketches/{sketch_id}/constraints:
+    post:
+      tags:
+      - CAD
+      summary: Add Constraint
+      operationId: add_constraint_api_v1_cad_sketches__sketch_id__constraints_post
       security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Current user payload
-    put:
-      summary: Update current user
-      tags: [Users]
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: User updated
-
-  /api/v1/users/{user_id}:
-    get:
-      summary: Get a public user profile
-      tags: [Users]
-      security:
-        - bearerAuth: []
+      - HTTPBearer: []
       parameters:
-        - $ref: '#/components/parameters/UserId'
+      - name: sketch_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Sketch Id
       responses:
         '200':
-          description: Public profile
-
-  /ws/projects/{project_id}:
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/cad/bodies:
     get:
-      summary: Real-time project updates
-      tags: [WebSocket]
+      tags:
+      - CAD
+      summary: List Bodies
+      operationId: list_bodies_api_v1_cad_bodies_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: file_id
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: File Id
       responses:
-        '101':
-          description: Switching Protocols
-
-  /ws/ai/chats/{chat_id}:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CADObjectOut'
+                title: Response List Bodies Api V1 Cad Bodies Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/cad/bodies/{body_id}/extrude:
+    post:
+      tags:
+      - CAD
+      summary: Extrude
+      operationId: extrude_api_v1_cad_bodies__body_id__extrude_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: body_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Body Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/cad/bodies/{body_id}/revolve:
+    post:
+      tags:
+      - CAD
+      summary: Revolve
+      operationId: revolve_api_v1_cad_bodies__body_id__revolve_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: body_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Body Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/cad/bodies/{body_id}/fillet:
+    post:
+      tags:
+      - CAD
+      summary: Fillet
+      operationId: fillet_api_v1_cad_bodies__body_id__fillet_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: body_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Body Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/cad/bodies/{body_id}/chamfer:
+    post:
+      tags:
+      - CAD
+      summary: Chamfer
+      operationId: chamfer_api_v1_cad_bodies__body_id__chamfer_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: body_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Body Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/cad/export/step/{body_id}:
     get:
-      summary: Stream AI responses
-      tags: [WebSocket]
+      tags:
+      - CAD
+      summary: Export Step
+      operationId: export_step_api_v1_cad_export_step__body_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: body_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Body Id
       responses:
-        '101':
-          description: Switching Protocols
-
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/cad/export/stl/{body_id}:
+    get:
+      tags:
+      - CAD
+      summary: Export Stl
+      operationId: export_stl_api_v1_cad_export_stl__body_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: body_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Body Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/pcb/boards:
+    post:
+      tags:
+      - PCB
+      summary: Create Board
+      operationId: create_board_api_v1_pcb_boards_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBoardRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/pcb/boards/{board_id}:
+    get:
+      tags:
+      - PCB
+      summary: Get Board
+      operationId: get_board_api_v1_pcb_boards__board_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Board Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - PCB
+      summary: Update Board
+      operationId: update_board_api_v1_pcb_boards__board_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Board Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBoardRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/pcb/components:
+    post:
+      tags:
+      - PCB
+      summary: Create Component
+      operationId: create_component_api_v1_pcb_components_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateComponentRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__api__v1__pcb__schemas__ComponentOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/pcb/components/{component_id}:
+    get:
+      tags:
+      - PCB
+      summary: Get Component
+      operationId: get_component_api_v1_pcb_components__component_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: component_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Component Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__api__v1__pcb__schemas__ComponentOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - PCB
+      summary: Update Component
+      operationId: update_component_api_v1_pcb_components__component_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: component_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Component Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateComponentRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app__api__v1__pcb__schemas__ComponentOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - PCB
+      summary: Delete Component
+      operationId: delete_component_api_v1_pcb_components__component_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: component_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Component Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/pcb/boards/{board_id}/drc:
+    post:
+      tags:
+      - PCB
+      summary: Run Drc
+      operationId: run_drc_api_v1_pcb_boards__board_id__drc_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Board Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/pcb/boards/{board_id}/erc:
+    post:
+      tags:
+      - PCB
+      summary: Run Erc
+      operationId: run_erc_api_v1_pcb_boards__board_id__erc_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Board Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/pcb/export/gerber/{board_id}:
+    get:
+      tags:
+      - PCB
+      summary: Export Gerber
+      operationId: export_gerber_api_v1_pcb_export_gerber__board_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Board Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/pcb/export/bom/{board_id}:
+    get:
+      tags:
+      - PCB
+      summary: Export Bom
+      operationId: export_bom_api_v1_pcb_export_bom__board_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: board_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Board Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/pcb/libraries/symbols:
+    get:
+      tags:
+      - PCB
+      summary: List Library Symbols
+      operationId: list_library_symbols_api_v1_pcb_libraries_symbols_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: library
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Library
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SymbolOut'
+                title: Response List Library Symbols Api V1 Pcb Libraries Symbols Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - PCB
+      summary: Create Library Symbol
+      operationId: create_library_symbol_api_v1_pcb_libraries_symbols_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSymbolRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SymbolOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/pcb/libraries/footprints:
+    get:
+      tags:
+      - PCB
+      summary: List Library Footprints
+      operationId: list_library_footprints_api_v1_pcb_libraries_footprints_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: package_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Package Type
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FootprintOut'
+                title: Response List Library Footprints Api V1 Pcb Libraries Footprints Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - PCB
+      summary: Create Library Footprint
+      operationId: create_library_footprint_api_v1_pcb_libraries_footprints_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFootprintRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FootprintOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/ai/chats:
+    post:
+      tags:
+      - AI
+      summary: Create Chat
+      operationId: create_chat_api_v1_ai_chats_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChatRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/ai/chats/{chat_id}:
+    get:
+      tags:
+      - AI
+      summary: Get Chat
+      operationId: get_chat_api_v1_ai_chats__chat_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatOut'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - AI
+      summary: Delete Chat
+      operationId: delete_chat_api_v1_ai_chats__chat_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/ai/chats/{chat_id}/messages:
+    post:
+      tags:
+      - AI
+      summary: Post Message
+      operationId: post_message_api_v1_ai_chats__chat_id__messages_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessageRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessageOut'
+                title: Response Post Message Api V1 Ai Chats  Chat Id  Messages Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - AI
+      summary: List Messages
+      operationId: list_messages_api_v1_ai_chats__chat_id__messages_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: chat_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Chat Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessageOut'
+                title: Response List Messages Api V1 Ai Chats  Chat Id  Messages Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/ai/agents:
+    get:
+      tags:
+      - AI
+      summary: List Agents
+      operationId: list_agents_api_v1_ai_agents_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AgentOut'
+                type: array
+                title: Response List Agents Api V1 Ai Agents Get
+      security:
+      - HTTPBearer: []
+  /api/v1/ai/providers:
+    get:
+      tags:
+      - AI
+      summary: List Providers
+      operationId: list_providers_api_v1_ai_providers_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ProviderOut'
+                type: array
+                title: Response List Providers Api V1 Ai Providers Get
+      security:
+      - HTTPBearer: []
+  /api/v1/ai/providers/configure:
+    post:
+      tags:
+      - AI
+      summary: Configure Provider
+      operationId: configure_provider_api_v1_ai_providers_configure_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigureProviderRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /health:
+    get:
+      summary: Healthcheck
+      operationId: healthcheck_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-  parameters:
-    ProjectId:
-      in: path
-      name: project_id
-      required: true
-      schema:
-        type: string
-        format: uuid
-    SketchId:
-      in: path
-      name: sketch_id
-      required: true
-      schema:
-        type: string
-        format: uuid
-    BodyId:
-      in: path
-      name: body_id
-      required: true
-      schema:
-        type: string
-        format: uuid
-    BoardId:
-      in: path
-      name: board_id
-      required: true
-      schema:
-        type: string
-        format: uuid
-    ChatId:
-      in: path
-      name: chat_id
-      required: true
-      schema:
-        type: string
-        format: uuid
-    FileId:
-      in: path
-      name: file_id
-      required: true
-      schema:
-        type: string
-        format: uuid
-    UserId:
-      in: path
-      name: user_id
-      required: true
-      schema:
-        type: string
-        format: uuid
   schemas:
-    RegisterRequest:
-      type: object
-      required: [email, password, name]
+    AddTeamMemberRequest:
       properties:
-        email:
+        user_id:
           type: string
-          format: email
-        password:
+          format: uuid
+          title: User Id
+        role:
           type: string
-          minLength: 12
+          pattern: ^(lead|member)$
+          title: Role
+          default: member
+      type: object
+      required:
+      - user_id
+      title: AddTeamMemberRequest
+    AgentOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
         name:
           type: string
-    LoginRequest:
+          title: Name
+        role:
+          type: string
+          title: Role
+        prompt:
+          type: string
+          title: Prompt
+        tools:
+          items: {}
+          type: array
+          title: Tools
+        memory_enabled:
+          type: boolean
+          title: Memory Enabled
       type: object
-      required: [email, password]
+      required:
+      - id
+      - name
+      - role
+      - prompt
+      - tools
+      - memory_enabled
+      title: AgentOut
+    BoardOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        file_id:
+          type: string
+          format: uuid
+          title: File Id
+        name:
+          type: string
+          title: Name
+        width_mm:
+          type: number
+          title: Width Mm
+        height_mm:
+          type: number
+          title: Height Mm
+        layers_count:
+          type: integer
+          title: Layers Count
+        data:
+          additionalProperties: true
+          type: object
+          title: Data
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - file_id
+      - name
+      - width_mm
+      - height_mm
+      - layers_count
+      - data
+      - created_at
+      - updated_at
+      title: BoardOut
+    Body_upload_file_api_v1_files_upload_post:
+      properties:
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - project_id
+      - file
+      title: Body_upload_file_api_v1_files_upload_post
+    CADObjectOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        file_id:
+          type: string
+          format: uuid
+          title: File Id
+        object_type:
+          type: string
+          title: Object Type
+        name:
+          type: string
+          title: Name
+        data:
+          additionalProperties: true
+          type: object
+          title: Data
+        parent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Parent Id
+        version_number:
+          type: integer
+          title: Version Number
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - file_id
+      - object_type
+      - name
+      - data
+      - parent_id
+      - version_number
+      - created_at
+      - updated_at
+      title: CADObjectOut
+    ChatOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        title:
+          type: string
+          title: Title
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - project_id
+      - user_id
+      - title
+      - created_at
+      - updated_at
+      title: ChatOut
+    ConfigureProviderRequest:
+      properties:
+        provider:
+          type: string
+          title: Provider
+        api_key:
+          type: string
+          title: Api Key
+      type: object
+      required:
+      - provider
+      - api_key
+      title: ConfigureProviderRequest
+    CreateBoardRequest:
+      properties:
+        file_id:
+          type: string
+          format: uuid
+          title: File Id
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+        width_mm:
+          type: number
+          title: Width Mm
+          default: 0
+        height_mm:
+          type: number
+          title: Height Mm
+          default: 0
+        layers_count:
+          type: integer
+          minimum: 1.0
+          title: Layers Count
+          default: 2
+      type: object
+      required:
+      - file_id
+      - name
+      title: CreateBoardRequest
+    CreateChatRequest:
+      properties:
+        project_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Project Id
+        title:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Title
+          default: New chat
+      type: object
+      title: CreateChatRequest
+    CreateComponentRequest:
+      properties:
+        board_id:
+          type: string
+          format: uuid
+          title: Board Id
+        reference_designator:
+          type: string
+          maxLength: 50
+          minLength: 1
+          title: Reference Designator
+        footprint_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Footprint Id
+        library_entry_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Library Entry Id
+        position_x:
+          type: number
+          title: Position X
+          default: 0
+        position_y:
+          type: number
+          title: Position Y
+          default: 0
+        rotation_degrees:
+          type: number
+          title: Rotation Degrees
+          default: 0
+        data:
+          additionalProperties: true
+          type: object
+          title: Data
+      type: object
+      required:
+      - board_id
+      - reference_designator
+      title: CreateComponentRequest
+    CreateFolderRequest:
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+        parent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Parent Id
+      type: object
+      required:
+      - name
+      title: CreateFolderRequest
+    CreateFootprintRequest:
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+        package_type:
+          type: string
+          maxLength: 100
+          minLength: 1
+          title: Package Type
+        pads:
+          items: {}
+          type: array
+          title: Pads
+        courtyard:
+          items: {}
+          type: array
+          title: Courtyard
+        silkscreen:
+          items: {}
+          type: array
+          title: Silkscreen
+      type: object
+      required:
+      - name
+      - package_type
+      title: CreateFootprintRequest
+    CreateMessageRequest:
+      properties:
+        content:
+          type: string
+          minLength: 1
+          title: Content
+      type: object
+      required:
+      - content
+      title: CreateMessageRequest
+    CreateOrganizationRequest:
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+      type: object
+      required:
+      - name
+      title: CreateOrganizationRequest
+    CreateProjectRequest:
+      properties:
+        organization_id:
+          type: string
+          format: uuid
+          title: Organization Id
+        team_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Team Id
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        type:
+          type: string
+          pattern: ^(cad|pcb|mixed|robotics)$
+          title: Type
+          default: mixed
+      type: object
+      required:
+      - organization_id
+      - name
+      title: CreateProjectRequest
+    CreateSimulationJobRequest:
+      properties:
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        file_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: File Id
+        job_type:
+          type: string
+          maxLength: 50
+          minLength: 1
+          title: Job Type
+        parameters:
+          additionalProperties: true
+          type: object
+          title: Parameters
+      type: object
+      required:
+      - project_id
+      - job_type
+      title: CreateSimulationJobRequest
+    CreateSketchRequest:
+      properties:
+        file_id:
+          type: string
+          format: uuid
+          title: File Id
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+        data:
+          additionalProperties: true
+          type: object
+          title: Data
+      type: object
+      required:
+      - file_id
+      - name
+      title: CreateSketchRequest
+    CreateSymbolRequest:
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+        library:
+          type: string
+          maxLength: 100
+          title: Library
+          default: Enginex Standard
+        svg_data:
+          type: string
+          title: Svg Data
+          default: ''
+        pins:
+          items: {}
+          type: array
+          title: Pins
+        meta:
+          additionalProperties: true
+          type: object
+          title: Meta
+      type: object
+      required:
+      - name
+      title: CreateSymbolRequest
+    CreateTeamRequest:
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+      type: object
+      required:
+      - name
+      title: CreateTeamRequest
+    FileOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        folder_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Folder Id
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          title: Type
+        size_bytes:
+          type: integer
+          title: Size Bytes
+        version_number:
+          type: integer
+          title: Version Number
+        created_by:
+          type: string
+          format: uuid
+          title: Created By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - project_id
+      - folder_id
+      - name
+      - type
+      - size_bytes
+      - version_number
+      - created_by
+      - created_at
+      - updated_at
+      title: FileOut
+    FileVersionOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        file_id:
+          type: string
+          format: uuid
+          title: File Id
+        version_number:
+          type: integer
+          title: Version Number
+        size_bytes:
+          type: integer
+          title: Size Bytes
+        created_by:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Created By
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - file_id
+      - version_number
+      - size_bytes
+      - created_by
+      - created_at
+      title: FileVersionOut
+    FolderOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        parent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Parent Id
+        name:
+          type: string
+          title: Name
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - project_id
+      - parent_id
+      - name
+      - created_at
+      title: FolderOut
+    FootprintOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        name:
+          type: string
+          title: Name
+        package_type:
+          type: string
+          title: Package Type
+        pads:
+          items: {}
+          type: array
+          title: Pads
+        courtyard:
+          items: {}
+          type: array
+          title: Courtyard
+        silkscreen:
+          items: {}
+          type: array
+          title: Silkscreen
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - name
+      - package_type
+      - pads
+      - courtyard
+      - silkscreen
+      - created_at
+      title: FootprintOut
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    InviteProjectRequest:
       properties:
         email:
           type: string
           format: email
+          title: Email
+        role:
+          type: string
+          pattern: ^(owner|editor|viewer)$
+          title: Role
+          default: viewer
+      type: object
+      required:
+      - email
+      title: InviteProjectRequest
+    LoginRequest:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
         password:
           type: string
-    AuthResponse:
+          title: Password
       type: object
+      required:
+      - email
+      - password
+      title: LoginRequest
+    MessageOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        chat_id:
+          type: string
+          format: uuid
+          title: Chat Id
+        role:
+          type: string
+          title: Role
+        content:
+          type: string
+          title: Content
+        tool_calls:
+          items: {}
+          type: array
+          title: Tool Calls
+        model_used:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Model Used
+        tokens_used:
+          type: integer
+          title: Tokens Used
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - chat_id
+      - role
+      - content
+      - tool_calls
+      - model_used
+      - tokens_used
+      - created_at
+      title: MessageOut
+    MoveFolderRequest:
+      properties:
+        parent_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Parent Id
+      type: object
+      title: MoveFolderRequest
+    OrganizationOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        name:
+          type: string
+          title: Name
+        owner_id:
+          type: string
+          format: uuid
+          title: Owner Id
+        subscription_tier:
+          type: string
+          title: Subscription Tier
+        settings:
+          additionalProperties: true
+          type: object
+          title: Settings
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - name
+      - owner_id
+      - subscription_tier
+      - settings
+      - created_at
+      - updated_at
+      title: OrganizationOut
+    ProjectMemberOut:
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        email:
+          type: string
+          title: Email
+        name:
+          type: string
+          title: Name
+        role:
+          type: string
+          title: Role
+      type: object
+      required:
+      - user_id
+      - email
+      - name
+      - role
+      title: ProjectMemberOut
+    ProjectOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        organization_id:
+          type: string
+          format: uuid
+          title: Organization Id
+        team_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Team Id
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        owner_id:
+          type: string
+          format: uuid
+          title: Owner Id
+        type:
+          type: string
+          title: Type
+        status:
+          type: string
+          title: Status
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - organization_id
+      - team_id
+      - name
+      - description
+      - owner_id
+      - type
+      - status
+      - created_at
+      - updated_at
+      title: ProjectOut
+    ProviderOut:
+      properties:
+        name:
+          type: string
+          title: Name
+        configured:
+          type: boolean
+          title: Configured
+      type: object
+      required:
+      - name
+      - configured
+      title: ProviderOut
+    RefreshRequest:
+      properties:
+        refresh_token:
+          type: string
+          title: Refresh Token
+      type: object
+      required:
+      - refresh_token
+      title: RefreshRequest
+    RegisterRequest:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          maxLength: 128
+          minLength: 8
+          title: Password
+        name:
+          type: string
+          maxLength: 255
+          minLength: 1
+          title: Name
+      type: object
+      required:
+      - email
+      - password
+      - name
+      title: RegisterRequest
+    ShareProjectRequest:
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        role:
+          type: string
+          pattern: ^(owner|editor|viewer)$
+          title: Role
+          default: viewer
+      type: object
+      required:
+      - user_id
+      title: ShareProjectRequest
+    SimulationJobOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        project_id:
+          type: string
+          format: uuid
+          title: Project Id
+        file_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: File Id
+        job_type:
+          type: string
+          title: Job Type
+        status:
+          type: string
+          title: Status
+        parameters:
+          additionalProperties: true
+          type: object
+          title: Parameters
+        result:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Result
+        report_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Report Url
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        completed_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Completed At
+      type: object
+      required:
+      - id
+      - project_id
+      - file_id
+      - job_type
+      - status
+      - parameters
+      - result
+      - report_url
+      - created_at
+      - updated_at
+      - completed_at
+      title: SimulationJobOut
+    SymbolOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        name:
+          type: string
+          title: Name
+        library:
+          type: string
+          title: Library
+        svg_data:
+          type: string
+          title: Svg Data
+        pins:
+          items: {}
+          type: array
+          title: Pins
+        meta:
+          additionalProperties: true
+          type: object
+          title: Meta
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - name
+      - library
+      - svg_data
+      - pins
+      - meta
+      - created_at
+      title: SymbolOut
+    TeamOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        organization_id:
+          type: string
+          format: uuid
+          title: Organization Id
+        name:
+          type: string
+          title: Name
+        members:
+          items: {}
+          type: array
+          title: Members
+      type: object
+      required:
+      - id
+      - organization_id
+      - name
+      - members
+      title: TeamOut
+    TokenResponse:
       properties:
         access_token:
           type: string
+          title: Access Token
         refresh_token:
           type: string
+          title: Refresh Token
         token_type:
           type: string
-    Project:
+          title: Token Type
+          default: bearer
+        user:
+          $ref: '#/components/schemas/app__api__v1__auth__schemas__UserOut'
       type: object
+      required:
+      - access_token
+      - refresh_token
+      - user
+      title: TokenResponse
+    UpdateBoardRequest:
       properties:
-        id:
-          type: string
-          format: uuid
         name:
-          type: string
+          anyOf:
+          - type: string
+            maxLength: 255
+            minLength: 1
+          - type: 'null'
+          title: Name
+        width_mm:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Width Mm
+        height_mm:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Height Mm
+        layers_count:
+          anyOf:
+          - type: integer
+            minimum: 1.0
+          - type: 'null'
+          title: Layers Count
+        data:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Data
+      type: object
+      title: UpdateBoardRequest
+    UpdateComponentRequest:
+      properties:
+        reference_designator:
+          anyOf:
+          - type: string
+            maxLength: 50
+            minLength: 1
+          - type: 'null'
+          title: Reference Designator
+        position_x:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Position X
+        position_y:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Position Y
+        rotation_degrees:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Rotation Degrees
+        data:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Data
+      type: object
+      title: UpdateComponentRequest
+    UpdateFolderRequest:
+      properties:
+        name:
+          anyOf:
+          - type: string
+            maxLength: 255
+            minLength: 1
+          - type: 'null'
+          title: Name
+      type: object
+      title: UpdateFolderRequest
+    UpdateOrganizationRequest:
+      properties:
+        name:
+          anyOf:
+          - type: string
+            maxLength: 255
+            minLength: 1
+          - type: 'null'
+          title: Name
+        settings:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Settings
+      type: object
+      title: UpdateOrganizationRequest
+    UpdateProfileRequest:
+      properties:
+        name:
+          anyOf:
+          - type: string
+            maxLength: 255
+            minLength: 1
+          - type: 'null'
+          title: Name
+        avatar:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Avatar
+        settings:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Settings
+      type: object
+      title: UpdateProfileRequest
+    UpdateProjectRequest:
+      properties:
+        name:
+          anyOf:
+          - type: string
+            maxLength: 255
+            minLength: 1
+          - type: 'null'
+          title: Name
         description:
-          type: string
-        type:
-          type: string
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
         status:
-          type: string
-    CreateProjectRequest:
+          anyOf:
+          - type: string
+            pattern: ^(active|archived)$
+          - type: 'null'
+          title: Status
       type: object
-      required: [name]
+      title: UpdateProjectRequest
+    UpdateSketchRequest:
       properties:
         name:
+          anyOf:
+          - type: string
+            maxLength: 255
+            minLength: 1
+          - type: 'null'
+          title: Name
+        data:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Data
+      type: object
+      title: UpdateSketchRequest
+    UpdateTeamRequest:
+      properties:
+        name:
+          anyOf:
+          - type: string
+            maxLength: 255
+            minLength: 1
+          - type: 'null'
+          title: Name
+      type: object
+      title: UpdateTeamRequest
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
           type: string
-        description:
-          type: string
+          title: Message
         type:
           type: string
-    CreateSketchRequest:
-      type: object
-      required: [name, plane]
-      properties:
-        name:
-          type: string
-        plane:
-          type: string
-        dimensions:
+          title: Error Type
+        input:
+          title: Input
+        ctx:
           type: object
-    CADSketch:
+          title: Context
       type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    app__api__v1__auth__schemas__UserOut:
       properties:
         id:
           type: string
           format: uuid
+          title: Id
+        email:
+          type: string
+          title: Email
         name:
           type: string
-        plane:
-          type: string
-    ChatMessageRequest:
+          title: Name
+        avatar:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Avatar
       type: object
-      required: [message]
+      required:
+      - id
+      - email
+      - name
+      title: UserOut
+    app__api__v1__components__schemas__ComponentOut:
       properties:
-        message:
+        id:
           type: string
-        attachments:
-          type: array
-          items:
-            type: string
+          format: uuid
+          title: Id
+        name:
+          type: string
+          title: Name
+        category:
+          type: string
+          title: Category
+        manufacturer:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Manufacturer
+        part_number:
+          type: string
+          title: Part Number
+        datasheet_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Datasheet Url
+        symbol_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Symbol Id
+        footprint_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Footprint Id
+        meta:
+          additionalProperties: true
+          type: object
+          title: Meta
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - name
+      - category
+      - manufacturer
+      - part_number
+      - datasheet_url
+      - symbol_id
+      - footprint_id
+      - meta
+      - created_at
+      title: ComponentOut
+    app__api__v1__pcb__schemas__ComponentOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        board_id:
+          type: string
+          format: uuid
+          title: Board Id
+        reference_designator:
+          type: string
+          title: Reference Designator
+        footprint_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Footprint Id
+        library_entry_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Library Entry Id
+        position_x:
+          type: number
+          title: Position X
+        position_y:
+          type: number
+          title: Position Y
+        rotation_degrees:
+          type: number
+          title: Rotation Degrees
+        data:
+          additionalProperties: true
+          type: object
+          title: Data
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - board_id
+      - reference_designator
+      - footprint_id
+      - library_entry_id
+      - position_x
+      - position_y
+      - rotation_degrees
+      - data
+      - created_at
+      - updated_at
+      title: ComponentOut
+    app__api__v1__users__schemas__UserOut:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        email:
+          type: string
+          title: Email
+        name:
+          type: string
+          title: Name
+        avatar:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Avatar
+        settings:
+          additionalProperties: true
+          type: object
+          title: Settings
+      type: object
+      required:
+      - id
+      - email
+      - name
+      title: UserOut
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
+servers:
+- url: http://localhost:8000
+  description: Local development
+- url: https://api.enginex.ai
+  description: Production (placeholder)
