@@ -43,9 +43,9 @@ schemas. By domain:
 | Files | Real | upload/download/versions/revert, local-disk or S3 storage |
 | Components, Symbols, Footprints | Real | search/list; symbols & footprints also creatable |
 | Simulation | Real API, no engine | job lifecycle (queued/cancelled) persists; nothing executes jobs yet |
-| CAD | Real persistence, stub engine | sketch CRUD is real; extrude/revolve/fillet/chamfer/export return `501` |
+| CAD | Real engine | sketch CRUD + real constraint solver; extrude/revolve/fillet/chamfer/boolean run on a CadQuery/OpenCascade kernel; STEP/STL/OBJ export from real geometry; assemblies with motion constraints and collision detection — see `services/backend/app/cad/` |
 | PCB | Real persistence, stub engine | board/component CRUD is real; DRC/ERC/Gerber/BOM export return `501` |
-| AI | Real | multi-provider router (OpenAI/Anthropic/Gemini/Groq/Together/OpenRouter/Azure/Ollama) with automatic fallback, 10 LangGraph agents, 22 tools wired to real CAD/PCB/component/simulation services, RAG (Qdrant), usage tracking. Runs on a no-key fake provider when no real provider is configured — see below |
+| AI | Real | multi-provider router (OpenAI/Anthropic/Gemini/Groq/Together/OpenRouter/Azure/Ollama) with automatic fallback, 10 LangGraph agents, 27 tools wired to real CAD/PCB/component/simulation services, RAG (Qdrant), usage tracking. Runs on a no-key fake provider when no real provider is configured — see below |
 | WebSocket collaboration | Real | Yjs (`y-py`) CRDT sync + presence, see below |
 | WebSocket AI streaming | Real | `/ws/ai/chats/{chat_id}` streams agent lifecycle events, see below |
 

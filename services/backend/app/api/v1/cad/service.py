@@ -143,16 +143,16 @@ class CADService:
 
     def add_sketch_constraint(self, sketch_id: uuid.UUID, payload: AddSketchConstraintRequest, user) -> dict:
         sketch = self.get(sketch_id, user, ROLE_EDITOR)
-        doc = SketchDocument.from_dict(sketch.data)
-        raw = doc.to_dict()
-        constraints = [SketchConstraint.from_dict(c) for c in raw.get("constraints", [])]
+        constraints = [SketchConstraint.from_dict(c) for c in sketch.data.get("constraints", [])]
         constraint_id = f"c_{len(constraints)}_{uuid.uuid4().hex[:6]}"
         new_constraint = SketchConstraint(constraint_id, payload.type, payload.entities, payload.value)
         constraints.append(new_constraint)
 
-        data = sketch.data
-        data["constraints"] = [c.to_dict() for c in constraints]
-        sketch.data = data
+        # A fresh dict, not `sketch.data` mutated in place: SQLAlchemy's
+        # change-tracking compares object identity/value on assignment, so
+        # `sketch.data = sketch.data` (even after mutating it) can be seen
+        # as a no-op and silently dropped on the next refresh().
+        sketch.data = {**sketch.data, "constraints": [c.to_dict() for c in constraints]}
         sketch.version_number += 1
         sketch.updated_by = user.id
         self.db.commit()

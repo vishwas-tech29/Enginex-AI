@@ -11,6 +11,26 @@
 - Deliver a 3D viewport for assemblies and design review.
 - Add project files, folder structures, and content versioning.
 - Enable real-time collaboration with Yjs and WebSocket events.
+- Parametric 3D CAD engine (`services/backend/app/cad/`), built on CadQuery/OpenCascade:
+  - 2D sketch entities (points, lines, circles, arcs) with a real geometric constraint
+    solver (`scipy.optimize.least_squares`, `trf` method) supporting horizontal, vertical,
+    parallel, perpendicular, equal-length, equal-radius, distance, length, angle,
+    concentric, tangent, coincident, and radius constraints, with rank-based
+    over/under-constrained detection.
+  - Feature-history modeling: bodies are stored as an ordered list of feature operations
+    (extrude, revolve, fillet, chamfer, boolean union/cut/intersect) and rebuilt on demand
+    by replaying them through the CadQuery kernel — genuinely parametric, so editing an
+    earlier feature re-derives everything downstream.
+  - Export to STEP, STL, and OBJ from real OCCT tessellation/geometry.
+  - Assembly system with part instances, revolute/prismatic motion constraints (real
+    Rodrigues-rotation and translation math), and AABB-based collision detection.
+  - 27 REST endpoints under `/api/v1/cad/*`; AI tool registry can create sketches, extrude,
+    revolve, fillet, and chamfer through the same real engine.
+  - Frontend: `Viewport3D` renders the kernel's real tessellated mesh via Three.js
+    `BufferGeometry`; the CAD editor page can build a body from a sketch and export it.
+  - Not yet implemented: sweep/loft/draft/rib/hole features, multi-loop sketch profiles
+    (holes in a face), and a full interactive feature-tree UI — a "quick cube" flow
+    demonstrates the pipeline end-to-end in place of a full sketcher UI for now.
 
 ## Phase 3 — AI platform
 - Introduce a multi-provider LLM router and cost controls.
