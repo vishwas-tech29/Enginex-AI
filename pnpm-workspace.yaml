@@ -6,6 +6,10 @@ packages:
   # auto-detection (which picks the sole app under apps/*) still resolves
   # unambiguously to apps/web.
   - "!apps/tinytrails-404"
+  # Velorah: the standalone marketing/landing site (Vite, not Next.js),
+  # deployed independently to velorah.io. Same reasoning as tinytrails-404
+  # above — excluded so Vercel's apps/web auto-detection stays unambiguous.
+  - "!apps/velorah"
 
 # jsdom (via jest-environment-jsdom) and fabric.js both list the native
 # `canvas` package as an optional peer for real canvas-pixel rendering.

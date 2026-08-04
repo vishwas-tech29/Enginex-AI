@@ -28,6 +28,16 @@ class ValidationError(EngineXException):
         super().__init__(f"Validation failed for field '{field}': {message}", "VALIDATION_ERROR", 422)
 
 
+class ServiceUnavailableError(EngineXException):
+    """Raised when a real integration exists but isn't configured in this
+    environment (e.g. no Stripe key set) — distinct from
+    EngineNotImplementedError, whose computation genuinely doesn't exist yet.
+    """
+
+    def __init__(self, message: str):
+        super().__init__(message, "SERVICE_UNAVAILABLE", 503)
+
+
 class EngineNotImplementedError(EngineXException):
     """Raised by endpoints whose geometry/routing/simulation engine doesn't exist yet.
 

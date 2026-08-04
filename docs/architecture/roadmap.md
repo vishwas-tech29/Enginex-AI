@@ -47,3 +47,37 @@
 - Run load and security testing at enterprise scale.
 - Add autoscaling, SLO monitoring, and incident response playbooks.
 - Expand compliance, disaster recovery, and enterprise support readiness.
+
+## Landing page & billing integration (Velorah)
+Velorah is Enginex AI's public marketing/signup site — a standalone Vite +
+React + TypeScript + Tailwind app (`apps/velorah/`, deployed independently
+of `apps/web`) integrated with real backend services:
+- Signup (`/api/v1/landing/signup`) creates a genuine login-capable account
+  through the existing `AuthService` (real password hashing, real JWTs) and
+  auto-provisions an `Organization` — not a parallel, insecure user-creation
+  path. Re-submitting an already-registered email returns `409` rather than
+  the account-takeover-shaped "return the existing user's tokens" behavior
+  from an earlier draft of this flow.
+- Billing (`/api/v1/billing/*`) is a real Stripe integration: Checkout
+  session creation and a signature-verified webhook handler
+  (`checkout.session.completed`, `customer.subscription.updated/deleted`,
+  `invoice.payment_failed`). With no `STRIPE_SECRET_KEY` configured (the
+  default in dev), it returns a clean `503 SERVICE_UNAVAILABLE` — signup
+  still succeeds, just without a checkout session — rather than crashing or
+  faking success.
+- Age verification (`/api/v1/age/*`) is a real, authenticated 18+ check with
+  every attempt (pass or reject) logged to the existing `audit_logs` table.
+  Only a birth year is stored (not a full DOB), and it is **not** encrypted
+  at rest — real field-level encryption (pgcrypto/KMS) is a follow-up.
+- Analytics events (`/api/v1/landing/analytics/event`) persist to a new
+  `analytics_events` table — real funnel data, no third-party analytics
+  vendor wired in yet.
+- Email (welcome, payment-failed) renders real Jinja2 templates and sends
+  over real SMTP when `SMTP_HOST` is configured; otherwise it logs the
+  rendered email instead of silently dropping it, mirroring the AI
+  provider router's fallback-provider pattern.
+- Not yet implemented: SendGrid/Mixpanel/Auth0/Sentry vendor integrations
+  (SMTP/log and DB-native analytics stand in for now), async email/analytics
+  dispatch via Celery (currently synchronous), GDPR data-export/erasure
+  flows, refunds/cancellation UI, and the affiliate/referral program —
+  all called out as forward-looking in the original spec's own "next steps."

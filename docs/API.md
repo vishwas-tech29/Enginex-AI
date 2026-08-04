@@ -46,6 +46,9 @@ schemas. By domain:
 | CAD | Real engine | sketch CRUD + real constraint solver; extrude/revolve/fillet/chamfer/boolean run on a CadQuery/OpenCascade kernel; STEP/STL/OBJ export from real geometry; assemblies with motion constraints and collision detection — see `services/backend/app/cad/` |
 | PCB | Real persistence, stub engine | board/component CRUD is real; DRC/ERC/Gerber/BOM export return `501` |
 | AI | Real | multi-provider router (OpenAI/Anthropic/Gemini/Groq/Together/OpenRouter/Azure/Ollama) with automatic fallback, 10 LangGraph agents, 27 tools wired to real CAD/PCB/component/simulation services, RAG (Qdrant), usage tracking. Runs on a no-key fake provider when no real provider is configured — see below |
+| Landing (`/landing/*`) | Real | signup creates a real login-capable account + auto-provisioned organization (reuses `AuthService`, no parallel/insecure user-creation path); pricing is real feature data; analytics events persist to `analytics_events` — see `services/backend/app/api/v1/landing/` and `apps/velorah/` |
+| Billing (`/billing/*`) | Real Stripe integration, optional key | real Stripe Checkout session creation + signature-verified webhook handling (`checkout.session.completed`, `subscription.updated/deleted`, `invoice.payment_failed`); returns `503 SERVICE_UNAVAILABLE` rather than crashing when `STRIPE_SECRET_KEY` isn't set — see `services/backend/app/api/v1/billing/` |
+| Age verification (`/age/*`) | Real | authenticated 18+ check with a persisted audit trail (reuses the existing `audit_logs` table); rejects under-18 without storing birth data — see `services/backend/app/api/v1/age/` |
 | WebSocket collaboration | Real | Yjs (`y-py`) CRDT sync + presence, see below |
 | WebSocket AI streaming | Real | `/ws/ai/chats/{chat_id}` streams agent lifecycle events, see below |
 

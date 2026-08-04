@@ -17,6 +17,7 @@ class Organization(Base, UUIDPKMixin, TimestampMixin):
     )
     subscription_tier: Mapped[str] = mapped_column(String(20), nullable=False, default="free")
     settings: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    stripe_customer_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
 
 
 class Team(Base, UUIDPKMixin):

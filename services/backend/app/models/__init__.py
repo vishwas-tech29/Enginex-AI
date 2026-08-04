@@ -1,4 +1,5 @@
 from app.models.ai_chat import AgentMemory, AIAgent, AIChat, AIMessage
+from app.models.analytics_event import AnalyticsEvent
 from app.models.api_key import APIKey
 from app.models.cad_object import CADObject
 from app.models.collab import YDocSnapshot
@@ -38,4 +39,5 @@ __all__ = [
     "Component",
     "SimulationJob",
     "YDocSnapshot",
+    "AnalyticsEvent",
 ]

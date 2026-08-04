@@ -1,11 +1,14 @@
 from fastapi import APIRouter
 
+from app.api.v1.age.routes import router as age_router
 from app.api.v1.ai.routes import router as ai_router
 from app.api.v1.auth.routes import router as auth_router
+from app.api.v1.billing.routes import router as billing_router
 from app.api.v1.cad.routes import router as cad_router
 from app.api.v1.components.routes import router as components_router
 from app.api.v1.files.routes import router as files_router
 from app.api.v1.folders.routes import router as folders_router
+from app.api.v1.landing.routes import router as landing_router
 from app.api.v1.organizations.routes import router as organizations_router
 from app.api.v1.pcb.routes import router as pcb_router
 from app.api.v1.projects.routes import router as projects_router
@@ -26,3 +29,6 @@ router.include_router(simulation_router)
 router.include_router(cad_router)
 router.include_router(pcb_router)
 router.include_router(ai_router)
+router.include_router(landing_router)
+router.include_router(billing_router)
+router.include_router(age_router)

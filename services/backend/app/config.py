@@ -61,6 +61,31 @@ class Settings(BaseSettings):
     qdrant_url: str = ":memory:"
     embedding_dimensions: int = 256
 
+    # Landing page / billing. Public-facing URLs the landing app and emails
+    # link back into; frontend_url is the Next.js app, landing_url is the
+    # standalone Velorah marketing site (apps/velorah).
+    frontend_url: str = "http://localhost:3000"
+    landing_url: str = "http://localhost:5173"
+
+    # Stripe — optional, like the AI provider keys above. Billing endpoints
+    # return a clean 503 rather than crashing when these are unset.
+    stripe_secret_key: str | None = None
+    stripe_webhook_secret: str | None = None
+    stripe_price_hobbyist_monthly: str | None = None
+    stripe_price_hobbyist_annual: str | None = None
+    stripe_price_professional_monthly: str | None = None
+    stripe_price_professional_annual: str | None = None
+
+    # Email — optional SMTP. Unset means EmailService logs instead of
+    # sending, so signup/dev flows never hard-fail on a missing mail server.
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_use_tls: bool = True
+    smtp_from_email: str = "noreply@velorah.io"
+    smtp_from_name: str = "Velorah"
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
