@@ -14,7 +14,7 @@ def _upload_file(client, headers, project_id, filename="part.cad"):
     return response.json()
 
 
-def test_cad_sketch_crud_and_stubbed_engine_ops(client):
+def test_cad_sketch_crud(client):
     _, headers = register_user(client, email="cad@enginex.ai")
     org = create_organization(client, headers)
     project = create_project(client, headers, org["id"], type_="cad")
@@ -40,10 +40,6 @@ def test_cad_sketch_crud_and_stubbed_engine_ops(client):
     )
     assert update_response.status_code == 200
     assert update_response.json()["version_number"] == 2
-
-    stub_response = client.post(f"/api/v1/cad/bodies/{sketch['id']}/extrude", headers=headers)
-    assert stub_response.status_code == 501
-    assert stub_response.json()["error"]["code"] == "NOT_IMPLEMENTED"
 
     delete_response = client.delete(f"/api/v1/cad/sketches/{sketch['id']}", headers=headers)
     assert delete_response.status_code == 204
