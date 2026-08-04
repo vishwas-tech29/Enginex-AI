@@ -120,8 +120,11 @@ class SketchSolver:
         x0 = varmap.pack()
 
         try:
+            # 'trf' (not 'lm') because 'lm' requires #residuals >= #variables
+            # and rejects under-constrained sketches outright — we want to
+            # detect that case ourselves, not have scipy throw on it.
             result = least_squares(
-                self._residual_vector, x0, args=(varmap,), method="lm", max_nfev=2000
+                self._residual_vector, x0, args=(varmap,), method="trf", max_nfev=2000
             )
         except Exception as exc:  # noqa: BLE001 — surface as a solve error, not a crash
             varmap.unpack(x0)  # restore original state
