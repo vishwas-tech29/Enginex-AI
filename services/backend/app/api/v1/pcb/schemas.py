@@ -67,3 +67,102 @@ class ComponentOut(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+# --- Routing ------------------------------------------------------------
+
+
+class XYPoint(BaseModel):
+    x: float
+    y: float
+
+
+class AddTraceRequest(BaseModel):
+    layer: str
+    start: XYPoint
+    end: XYPoint
+    net: str = Field(min_length=1)
+    width: float | None = None
+
+
+class AddViaRequest(BaseModel):
+    position: XYPoint
+    from_layer: str
+    to_layer: str
+    net: str = Field(min_length=1)
+    pad_diameter: float | None = None
+    drill_diameter: float | None = None
+
+
+class AutoRouteRequest(BaseModel):
+    layer: str = "top_copper"
+
+
+class TraceOut(BaseModel):
+    id: str
+    layer: str
+    start: dict
+    end: dict
+    width: float
+    net: str
+
+
+class ViaOut(BaseModel):
+    id: str
+    position: dict
+    pad_dia: float
+    drill_dia: float
+    from_layer: str
+    to_layer: str
+    net: str
+
+
+class AutoRouteResponse(BaseModel):
+    traces: list[TraceOut]
+
+
+class OptimizeTracesRequest(BaseModel):
+    net: str = Field(min_length=1)
+
+
+class OptimizeTracesResponse(BaseModel):
+    removed: int
+
+
+# --- DRC / ERC ------------------------------------------------------------
+
+
+class DRCViolationOut(BaseModel):
+    id: str
+    rule: str
+    severity: str
+    location: list[float]
+    items: list[str]
+    message: str
+
+
+class DRCResponse(BaseModel):
+    violations: list[DRCViolationOut]
+
+
+class ERCViolationOut(BaseModel):
+    id: str
+    rule: str
+    severity: str
+    net: str
+    message: str
+
+
+class ERCResponse(BaseModel):
+    violations: list[ERCViolationOut]
+
+
+# --- Visualization ------------------------------------------------------------
+
+
+class PCBMeshResponse(BaseModel):
+    vertices: list[list[float]]
+    triangles: list[list[int]]
+    bounding_box: dict
+    volume: float
+    surface_area: float

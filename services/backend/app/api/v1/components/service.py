@@ -67,6 +67,24 @@ class ComponentService:
         self.db.refresh(symbol)
         return symbol
 
+    def get_footprints_by_ids(self, footprint_ids: list[uuid.UUID]) -> dict[str, Footprint]:
+        """Bulk lookup keyed by string id, for engines that need to resolve
+        many components' footprints without an N+1 query per component."""
+        ids = {fid for fid in footprint_ids if fid is not None}
+        if not ids:
+            return {}
+        rows = self.db.query(Footprint).filter(Footprint.id.in_(ids)).all()
+        return {str(row.id): row for row in rows}
+
+    def get_components_by_ids(self, component_ids: list[uuid.UUID]) -> dict[str, Component]:
+        """Bulk lookup of shared library Components (category/part number/
+        manufacturer), keyed by string id — mirrors get_footprints_by_ids."""
+        ids = {cid for cid in component_ids if cid is not None}
+        if not ids:
+            return {}
+        rows = self.db.query(Component).filter(Component.id.in_(ids)).all()
+        return {str(row.id): row for row in rows}
+
     def list_footprints(self, package_type: str | None) -> list[Footprint]:
         query = self.db.query(Footprint)
         if package_type:

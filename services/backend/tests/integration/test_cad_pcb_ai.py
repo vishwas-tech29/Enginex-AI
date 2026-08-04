@@ -76,7 +76,8 @@ def test_pcb_board_and_component_crud(client):
     assert update_response.json()["reference_designator"] == "R2"
 
     drc_response = client.post(f"/api/v1/pcb/boards/{board['id']}/drc", headers=headers)
-    assert drc_response.status_code == 501
+    assert drc_response.status_code == 200
+    assert drc_response.json() == {"violations": []}
 
     delete_response = client.delete(f"/api/v1/pcb/components/{component['id']}", headers=headers)
     assert delete_response.status_code == 204
