@@ -7,7 +7,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc libpq-dev curl \
+    && apt-get install -y --no-install-recommends \
+        gcc libpq-dev curl \
+        # OCP (OpenCascade bindings, via cadquery) links against these even
+        # headless — omitting them fails at import with "libGL.so.1: cannot
+        # open shared object file".
+        libgl1 libglu1-mesa libxrender1 libxext6 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
