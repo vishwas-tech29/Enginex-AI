@@ -3,10 +3,18 @@ import logging
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
 
 from app.core.exceptions import EngineXException
 
 logger = logging.getLogger("enginex.errors")
+
+
+async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
+    return JSONResponse(
+        status_code=429,
+        content={"error": {"code": "RATE_LIMITED", "message": f"Rate limit exceeded: {exc.detail}", "status_code": 429}},
+    )
 
 
 def register_error_handlers(app: FastAPI) -> None:

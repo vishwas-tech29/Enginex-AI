@@ -5,6 +5,8 @@ import { Button } from '@/components/common/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { ApiError } from '@/types/errors';
 
+import { OAuthButtons } from './OAuthButtons';
+
 export function RegisterForm() {
   const router = useRouter();
   const { register, isLoading } = useAuth();
@@ -25,41 +27,48 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      <label className="flex flex-col gap-1 text-sm text-slate-700">
-        Name
-        <input
-          required
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          className="rounded-md border border-slate-300 px-3 py-2"
-        />
-      </label>
-      <label className="flex flex-col gap-1 text-sm text-slate-700">
-        Email
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          className="rounded-md border border-slate-300 px-3 py-2"
-        />
-      </label>
-      <label className="flex flex-col gap-1 text-sm text-slate-700">
-        Password
-        <input
-          type="password"
-          required
-          minLength={8}
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          className="rounded-md border border-slate-300 px-3 py-2"
-        />
-      </label>
-      <Button type="submit" isLoading={isLoading}>
-        Create account
-      </Button>
-    </form>
+    <>
+      <OAuthButtons />
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {error && (
+          <p className="animate-auth-slide-down text-sm text-red-600" role="alert">
+            {error}
+          </p>
+        )}
+        <label className="flex flex-col gap-1 text-sm text-slate-700">
+          Name
+          <input
+            required
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            className="rounded-md border border-slate-300 px-3 py-2"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm text-slate-700">
+          Email
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            className="rounded-md border border-slate-300 px-3 py-2"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm text-slate-700">
+          Password
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            className="rounded-md border border-slate-300 px-3 py-2"
+          />
+        </label>
+        <Button type="submit" isLoading={isLoading}>
+          Create account
+        </Button>
+      </form>
+    </>
   );
 }

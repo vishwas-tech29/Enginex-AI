@@ -63,9 +63,20 @@ class Settings(BaseSettings):
 
     # Landing page / billing. Public-facing URLs the landing app and emails
     # link back into; frontend_url is the Next.js app, landing_url is the
-    # standalone Velorah marketing site (apps/velorah).
+    # standalone Velorah marketing site (apps/velorah), backend_url is this
+    # API itself — needed for OAuth redirect_uri, which must be an absolute
+    # URL registered with the provider.
     frontend_url: str = "http://localhost:3000"
     landing_url: str = "http://localhost:5173"
+    backend_url: str = "http://localhost:8000"
+
+    # OAuth — optional, like Stripe/SMTP above. Sign-in with a provider
+    # whose Client ID/Secret aren't set returns a clean 503 rather than a
+    # broken redirect.
+    google_client_id: str | None = None
+    google_client_secret: str | None = None
+    github_client_id: str | None = None
+    github_client_secret: str | None = None
 
     # Stripe — optional, like the AI provider keys above. Billing endpoints
     # return a clean 503 rather than crashing when these are unset.

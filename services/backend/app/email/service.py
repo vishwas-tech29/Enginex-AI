@@ -4,7 +4,13 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from app.config import settings
-from app.email.templates import PAYMENT_FAILED_TEMPLATE, WELCOME_EMAIL_TEMPLATE
+from app.email.templates import (
+    PASSWORD_CHANGED_TEMPLATE,
+    PASSWORD_RESET_TEMPLATE,
+    PAYMENT_FAILED_TEMPLATE,
+    WELCOME_EMAIL_TEMPLATE,
+)
+from app.utils.security import PASSWORD_RESET_TOKEN_EXPIRE_MINUTES
 
 logger = logging.getLogger("enginex.email")
 
@@ -61,6 +67,18 @@ class EmailService:
             billing_url=f"{settings.frontend_url}/dashboard/settings",
         )
         return self.send(to, "Payment failed — action required", html)
+
+    def send_password_reset(self, to: str, full_name: str, reset_url: str) -> bool:
+        html = PASSWORD_RESET_TEMPLATE.render(
+            full_name=full_name,
+            reset_url=reset_url,
+            expires_minutes=PASSWORD_RESET_TOKEN_EXPIRE_MINUTES,
+        )
+        return self.send(to, "Reset your Velorah password", html)
+
+    def send_password_changed(self, to: str, full_name: str) -> bool:
+        html = PASSWORD_CHANGED_TEMPLATE.render(full_name=full_name, support_email=settings.smtp_from_email)
+        return self.send(to, "Your Velorah password was changed", html)
 
 
 email_service = EmailService()

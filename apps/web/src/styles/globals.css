@@ -30,6 +30,67 @@
   animation: hero-marquee 20s linear infinite;
 }
 
+/* Auth forms (login/signup/password reset) — the card fades+scales in on
+   mount, inline errors slide down rather than popping in, and the layout's
+   icon has a slow idle float. Scoped to auth-* class names so nothing here
+   leaks into or collides with unrelated page transitions. */
+@keyframes auth-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes auth-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes auth-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes auth-float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-auth-fade-in {
+  animation: auth-fade-in 0.4s ease-out both;
+}
+
+.animate-auth-scale-in {
+  animation: auth-scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-auth-slide-down {
+  animation: auth-slide-down 0.25s ease-out both;
+}
+
+.animate-auth-float {
+  animation: auth-float 3s ease-in-out infinite;
+}
+
 :root {
   color-scheme: light;
 }

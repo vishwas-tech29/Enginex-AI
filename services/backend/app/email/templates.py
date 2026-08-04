@@ -89,3 +89,62 @@ PAYMENT_FAILED_TEMPLATE = Template(
 </html>
 """
 )
+
+PASSWORD_RESET_TEMPLATE = Template(
+    """
+<html>
+  <body style="font-family: 'Inter', sans-serif; color: #ffffff; background: #0d0f1a;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 40px;">
+
+      <h1 style="font-family: 'Instrument Serif', serif; font-size: 28px; text-align: center;">
+        Reset your password
+      </h1>
+
+      <p style="color: #a6aeba; margin-top: 20px;">
+        Hi {{ full_name }},
+      </p>
+
+      <p style="color: #a6aeba; line-height: 1.6;">
+        We received a request to reset your password. This link expires in {{ expires_minutes }} minutes.
+        If you didn't request this, you can safely ignore this email.
+      </p>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ reset_url }}"
+           style="background: rgba(255, 255, 255, 0.1); color: #ffffff; padding: 12px 32px;
+                  border-radius: 24px; text-decoration: none; display: inline-block;
+                  border: 1px solid rgba(255, 255, 255, 0.2);">
+          Reset Password
+        </a>
+      </div>
+
+    </div>
+  </body>
+</html>
+"""
+)
+
+PASSWORD_CHANGED_TEMPLATE = Template(
+    """
+<html>
+  <body style="font-family: 'Inter', sans-serif; color: #ffffff; background: #0d0f1a;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 40px;">
+
+      <h1 style="font-family: 'Instrument Serif', serif; font-size: 28px; text-align: center;">
+        Your password was changed
+      </h1>
+
+      <p style="color: #a6aeba; margin-top: 20px;">
+        Hi {{ full_name }},
+      </p>
+
+      <p style="color: #a6aeba; line-height: 1.6;">
+        This is a confirmation that your Velorah account password was just changed. If this wasn't you,
+        contact <a href="mailto:{{ support_email }}" style="color: #ffffff;">{{ support_email }}</a> immediately.
+      </p>
+
+    </div>
+  </body>
+</html>
+"""
+)

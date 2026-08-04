@@ -11,10 +11,20 @@ class User(Base, UUIDPKMixin, TimestampMixin):
     __tablename__ = "users"
 
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
-    password_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    # Nullable: OAuth-only accounts (see oauth_provider below) never set a
+    # password. AuthService.login rejects password login for those rather
+    # than comparing against a hash that was never set.
+    password_hash: Mapped[str | None] = mapped_column(Text, nullable=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     avatar: Mapped[str | None] = mapped_column(Text, nullable=True)
     settings: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_login_ip: Mapped[str | None] = mapped_column(String(45), nullable=True)
+
+    # OAuth identity (Google/GitHub). Both null for password-only accounts.
+    oauth_provider: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    oauth_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # Landing-page / growth attribution — set on signup, never overwritten after.
     created_from: Mapped[str | None] = mapped_column(String(50), nullable=True)
