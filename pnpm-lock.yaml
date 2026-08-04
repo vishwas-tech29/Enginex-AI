@@ -23,6 +23,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@fontsource/geist-sans':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@react-three/drei':
         specifier: 9.114.3
         version: 9.114.3(@react-three/fiber@8.17.10(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.169.0))(@types/react@18.3.5)(@types/three@0.169.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.169.0)
@@ -320,6 +323,9 @@ packages:
   '@eslint/js@8.57.0':
     resolution: {integrity: sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+
+  '@fontsource/geist-sans@5.3.0':
+    resolution: {integrity: sha512-AmG7cE1AvE4NHROPaOl1sN+a02cB5xy6pA/ZV76HXqWTCsJTV2SCBc9DTFHfJqnVOODm7HhXIYtUIb75NP5QXQ==}
 
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
@@ -3618,6 +3624,8 @@ snapshots:
       - supports-color
 
   '@eslint/js@8.57.0': {}
+
+  '@fontsource/geist-sans@5.3.0': {}
 
   '@humanwhocodes/config-array@0.11.14':
     dependencies:

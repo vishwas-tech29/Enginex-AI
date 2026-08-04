@@ -68,10 +68,9 @@ PAID_TIERS = ("hobbyist", "professional")
 
 logger = logging.getLogger("enginex.billing")
 
-# Stripe uses American spelling ("canceled"); this app's subscription_status
-# enum (see migrations/versions/001_initial_schema.py) uses "cancelled".
-# Map Stripe's statuses onto ours rather than writing Stripe's spelling
-# straight into a column a real Postgres ENUM would reject.
+# Stripe uses American spelling ("canceled"); Subscription.status elsewhere
+# in this app uses "cancelled". Map Stripe's statuses onto ours rather than
+# writing Stripe's spelling straight into the column.
 _STRIPE_STATUS_MAP = {
     "active": "active",
     "trialing": "active",

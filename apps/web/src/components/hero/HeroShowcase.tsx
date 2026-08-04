@@ -1,5 +1,25 @@
-import { ArrowRight, Globe, Instagram, Twitter } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useRef } from 'react';
+
+import { Button } from '@/components/common/Button';
+
+const VIDEO_URL =
+  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_065045_c44942da-53c6-4804-b734-f9e07fc22e08.mp4';
+
+const NAV_ITEMS = [
+  { label: 'Features', hasChevron: true },
+  { label: 'Solutions', hasChevron: false },
+  { label: 'Plans', hasChevron: false },
+  { label: 'Learning', hasChevron: true },
+];
+
+// Real technologies this platform is actually built on — not fabricated
+// customer/brand logos (the "Relied on by brands across the globe" framing
+// this component started from would have been an unsubstantiated claim for
+// a product with no customers yet).
+const TECH_STACK = ['CadQuery', 'OpenCascade', 'Three.js', 'FastAPI', 'PostgreSQL', 'LangGraph'];
+const MARQUEE_ITEMS = [...TECH_STACK, ...TECH_STACK];
 
 export function HeroShowcase() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -91,95 +111,102 @@ export function HeroShowcase() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
+    <div className="hero-theme relative min-h-screen overflow-hidden bg-[hsl(var(--hero-bg))] text-[hsl(var(--hero-fg))]">
       <video
         ref={videoRef}
-        className="absolute inset-0 h-full w-full translate-y-[17%] object-cover"
-        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_115001_bcdaa3b4-03de-47e7-ad63-ae3e392c32d4.mp4"
+        className="absolute inset-0 h-full w-full object-cover opacity-0"
+        src={VIDEO_URL}
         muted
         autoPlay
         playsInline
         preload="auto"
       />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.15),transparent_45%),linear-gradient(180deg,rgba(0,0,0,0.58),rgba(0,0,0,0.84))]" />
+      <div className="relative z-10 flex min-h-screen flex-col overflow-visible">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[527px] w-[984px] -translate-x-1/2 -translate-y-1/2 bg-gray-950 opacity-90 blur-[82px]"
+        />
 
-      <div className="relative z-20 flex min-h-screen flex-col">
-        <nav className="px-6 py-6 sm:px-8 lg:px-10">
-          <div className="liquid-glass mx-auto flex max-w-5xl items-center justify-between rounded-full px-6 py-3">
+        <header className="relative z-20">
+          <nav className="flex items-center justify-between px-8 py-5">
             <div className="flex items-center gap-2">
-              <div className="rounded-full bg-white/10 p-2">
-                <Globe size={20} className="text-white" />
+              <div className="liquid-glass flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold">
+                E
               </div>
-              <span className="text-lg font-semibold tracking-wide text-white">Asme</span>
+              <span className="text-lg font-semibold tracking-wide" style={{ fontFamily: "'General Sans', sans-serif" }}>
+                Enginex AI
+              </span>
             </div>
 
             <div className="hidden items-center gap-8 md:flex">
-              <a href="#features" className="text-sm font-medium text-white/80 transition-colors hover:text-white">
-                Features
-              </a>
-              <a href="#pricing" className="text-sm font-medium text-white/80 transition-colors hover:text-white">
-                Pricing
-              </a>
-              <a href="#about" className="text-sm font-medium text-white/80 transition-colors hover:text-white">
-                About
-              </a>
+              {NAV_ITEMS.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  className="flex items-center gap-1 text-sm font-medium text-[hsl(var(--hero-fg))]/90 transition-colors hover:text-[hsl(var(--hero-fg))]"
+                >
+                  {item.label}
+                  {item.hasChevron && <ChevronDown size={14} />}
+                </button>
+              ))}
             </div>
 
-            <div className="flex items-center gap-4">
-              <button type="button" className="text-sm font-medium text-white transition-colors hover:text-white/80">
+            <Link href="/register">
+              <Button variant="heroSecondary" className="px-4 py-2 text-sm">
                 Sign Up
-              </button>
-              <button type="button" className="liquid-glass rounded-full px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-white/5">
-                Login
-              </button>
-            </div>
-          </div>
-        </nav>
+              </Button>
+            </Link>
+          </nav>
+          <div className="mt-[3px] h-px bg-gradient-to-r from-transparent via-[hsl(var(--hero-fg))]/20 to-transparent" />
+        </header>
 
-        <main className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center sm:px-8 lg:px-10">
+        <main className="flex flex-1 flex-col items-center justify-center px-6 text-center">
           <h1
-            className="mb-8 whitespace-nowrap text-5xl tracking-tight text-white sm:text-6xl lg:text-7xl"
-            style={{ fontFamily: "'Instrument Serif', serif" }}
+            className="text-[min(220px,16vw)] font-normal leading-[1.02] tracking-[-0.024em]"
+            style={{ fontFamily: "'General Sans', sans-serif" }}
           >
-            Built for the curious
+            <span>Design </span>
+            <span
+              className="bg-clip-text text-transparent"
+              style={{ backgroundImage: 'linear-gradient(to left, #6366f1, #a855f7, #fcd34d)' }}
+            >
+              AI
+            </span>
           </h1>
 
-          <div className="w-full max-w-xl space-y-4">
-            <form className="liquid-glass flex items-center gap-3 rounded-full py-2 pl-6 pr-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full bg-transparent text-base text-white outline-none placeholder:text-white/40"
-                aria-label="Email"
-              />
-              <button type="submit" className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105" aria-label="Submit">
-                <ArrowRight size={20} />
-              </button>
-            </form>
+          <p className="mt-[9px] max-w-md text-lg leading-8 text-[hsl(var(--hero-sub))] opacity-80">
+            The most powerful AI copilot ever built
+            <br />
+            for real hardware engineering
+          </p>
 
-            <p className="px-4 text-sm leading-relaxed text-white/85">
-              Stay updated with the latest news and insights. Subscribe to our newsletter today and never miss out on exciting updates.
-            </p>
-
-            <div className="flex justify-center">
-              <button type="button" className="liquid-glass rounded-full px-8 py-3 text-sm font-medium text-white transition-colors hover:bg-white/5">
-                Read our manifesto
-              </button>
-            </div>
-          </div>
+          <Link href="/register" className="mt-[25px]">
+            <Button variant="heroSecondary" className="px-[29px] py-[24px] text-sm">
+              Start building
+            </Button>
+          </Link>
         </main>
 
-        <footer className="relative z-10 flex justify-center gap-4 pb-12">
-          <a href="#instagram" aria-label="Instagram" className="liquid-glass rounded-full p-4 text-white/80 transition-all hover:bg-white/5 hover:text-white">
-            <Instagram size={20} />
-          </a>
-          <a href="#twitter" aria-label="Twitter" className="liquid-glass rounded-full p-4 text-white/80 transition-all hover:bg-white/5 hover:text-white">
-            <Twitter size={20} />
-          </a>
-          <a href="#globe" aria-label="Globe" className="liquid-glass rounded-full p-4 text-white/80 transition-all hover:bg-white/5 hover:text-white">
-            <Globe size={20} />
-          </a>
+        <footer className="relative z-20 pb-10">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-12 px-6 md:flex-row md:items-center md:justify-between">
+            <p className="whitespace-pre-line text-sm text-[hsl(var(--hero-fg))]/50">
+              {'Built with modern,\nopen engineering tools'}
+            </p>
+
+            <div className="w-full overflow-hidden md:w-auto">
+              <div className="flex w-max animate-hero-marquee gap-16">
+                {MARQUEE_ITEMS.map((name, index) => (
+                  <div key={`${name}-${index}`} className="flex shrink-0 items-center gap-3">
+                    <div className="liquid-glass flex h-6 w-6 items-center justify-center rounded-lg text-xs font-semibold">
+                      {name[0]}
+                    </div>
+                    <span className="text-base font-semibold text-[hsl(var(--hero-fg))]">{name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </footer>
       </div>
     </div>

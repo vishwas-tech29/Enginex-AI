@@ -1,8 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap');
+@import '@fontsource/geist-sans';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Scoped to the homepage hero only — prefixed (not the bare --background /
+   --foreground names a future global shadcn-style theme might want) so it
+   can't collide with or get mistaken for app-wide theming. The rest of the
+   app is light-themed (see tailwind.config.js `brand` palette); this is a
+   deliberately different, self-contained dark section. */
+.hero-theme {
+  --hero-bg: 260 87% 3%;
+  --hero-fg: 40 6% 95%;
+  --hero-sub: 40 6% 82%;
+}
+
+@keyframes hero-marquee {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-hero-marquee {
+  animation: hero-marquee 20s linear infinite;
+}
 
 :root {
   color-scheme: light;
