@@ -1,5 +1,16 @@
 # AI agent definitions
 
+> **Implementation status:** the system described below is real and tested
+> as of Step 3 — see `services/backend/app/ai/`. Two differences from this
+> original design: agents run understand → plan → execute → output (no
+> execute↔review loop-back — an LLM-judged "is this acceptable?" gate is
+> exactly the kind of condition that can silently never trigger and loop
+> forever, so it was cut in favor of a bounded, finite pass), and a 10th
+> agent, `ComponentRecommendationAgent`, was added
+> (`app/ai/agents/definitions.py`). Tool names in code are close but not
+> always identical to the catalog below — `app/ai/tools/*_tools.py` is
+> authoritative.
+
 ## Agent catalog
 
 ### PlannerAgent

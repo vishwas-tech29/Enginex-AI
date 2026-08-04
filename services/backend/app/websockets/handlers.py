@@ -6,32 +6,10 @@ from sqlalchemy.orm import Session
 
 from app.api.v1.files.service import FileService
 from app.database import get_db
-from app.models.user import User
-from app.utils.security import decode_token
+from app.websockets.auth import authenticate_websocket
 from app.websockets.manager import manager
 
 router = APIRouter()
-
-
-async def _authenticate(websocket: WebSocket, db: Session) -> User | None:
-    token = websocket.query_params.get("token")
-    if not token:
-        await websocket.close(code=4401)
-        return None
-    try:
-        payload = decode_token(token)
-        if payload.get("type") != "access":
-            raise ValueError("wrong token type")
-        user_id = uuid.UUID(payload["sub"])
-    except Exception:
-        await websocket.close(code=4401)
-        return None
-
-    user = db.get(User, user_id)
-    if not user:
-        await websocket.close(code=4401)
-        return None
-    return user
 
 
 @router.websocket("/ws/files/{file_id}")
@@ -40,7 +18,7 @@ async def file_collaboration_endpoint(
     file_id: uuid.UUID,
     db: Session = Depends(get_db),
 ):
-    user = await _authenticate(websocket, db)
+    user = await authenticate_websocket(websocket, db)
     if user is None:
         return
 

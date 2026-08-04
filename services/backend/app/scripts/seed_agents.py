@@ -1,35 +1,43 @@
-"""Seed the AI agent roster described in docs/architecture/ai-agents.md.
+"""Seed the AI agent catalog from app.ai.agents.definitions (the single
+source of truth also used to build the runtime LangGraph agents).
 
 Run with: python -m app.scripts.seed_agents
-Idempotent — skips agents whose name already exists.
+Idempotent — updates role/prompt for agents whose name already exists,
+rather than skipping, so the DB catalog can't drift from the code.
 """
+from app.ai.agents.definitions import AGENT_DEFINITIONS
+from app.ai.tools.registry import ToolRegistry
+from app.ai.tools.setup import ensure_tools_registered
 from app.database import SessionLocal
 from app.models.ai_chat import AIAgent
 
-AGENTS = [
-    {"name": "PlannerAgent", "role": "planning", "prompt": "Break high-level requests into work items."},
-    {"name": "MechanicalCADAgent", "role": "cad", "prompt": "Create parametric features and geometry operations."},
-    {"name": "PCBDesignAgent", "role": "pcb", "prompt": "Suggest layouts and routing heuristics."},
-    {"name": "ElectronicsAgent", "role": "electronics", "prompt": "Evaluate circuits and component compatibility."},
-    {"name": "SimulationAgent", "role": "simulation", "prompt": "Execute FEA, SPICE, or motion analysis jobs."},
-    {"name": "FirmwareAgent", "role": "firmware", "prompt": "Write embedded C/C++ or Rust code."},
-    {"name": "ManufacturingAgent", "role": "manufacturing", "prompt": "Estimate BOM cost and assembly feasibility."},
-    {"name": "DesignReviewAgent", "role": "review", "prompt": "Perform QA, DRC, and release checks."},
-    {"name": "DocumentationAgent", "role": "documentation", "prompt": "Create design notes, user guides, and handoffs."},
-]
-
 
 def seed() -> None:
+    registry: ToolRegistry = ensure_tools_registered()
     db = SessionLocal()
     try:
-        created = 0
-        for agent in AGENTS:
-            if db.query(AIAgent).filter(AIAgent.name == agent["name"]).first():
-                continue
-            db.add(AIAgent(**agent, tools=[], memory_enabled=True))
-            created += 1
+        created, updated = 0, 0
+        for definition in AGENT_DEFINITIONS:
+            tool_names = [t["name"] for t in registry.get_tools_for_role(definition.role)]
+            existing = db.query(AIAgent).filter(AIAgent.name == definition.name).first()
+            if existing:
+                existing.role = definition.role
+                existing.prompt = definition.system_prompt
+                existing.tools = tool_names
+                updated += 1
+            else:
+                db.add(
+                    AIAgent(
+                        name=definition.name,
+                        role=definition.role,
+                        prompt=definition.system_prompt,
+                        tools=tool_names,
+                        memory_enabled=True,
+                    )
+                )
+                created += 1
         db.commit()
-        print(f"Seeded {created} new agents.")
+        print(f"Seeded {created} new agents, updated {updated} existing.")
     finally:
         db.close()
 

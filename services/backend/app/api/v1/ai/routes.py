@@ -12,6 +12,8 @@ from app.api.v1.ai.schemas import (
     MessageOut,
     ProviderOut,
 )
+from app.ai.orchestrator import AIOrchestrator
+from app.ai.setup import get_orchestrator
 from app.api.v1.ai.service import AIService
 from app.api.v1.auth.dependencies import get_current_user
 from app.database import get_db
@@ -54,13 +56,14 @@ def delete_chat(
 
 
 @router.post("/chats/{chat_id}/messages", response_model=list[MessageOut], status_code=201)
-def post_message(
+async def post_message(
     chat_id: uuid.UUID,
     payload: CreateMessageRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    orchestrator: AIOrchestrator = Depends(get_orchestrator),
 ):
-    return AIService(db).post_message(chat_id, payload.content, current_user)
+    return await AIService(db).post_message(chat_id, payload.content, current_user, orchestrator)
 
 
 @router.get("/chats/{chat_id}/messages", response_model=list[MessageOut])

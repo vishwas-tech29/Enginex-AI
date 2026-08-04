@@ -6,6 +6,7 @@ from app.config import settings
 from app.core.logging import setup_logging
 from app.middleware.error_handler import register_error_handlers
 from app.middleware.logging import register_request_logging
+from app.websockets.ai_streaming import router as ai_websocket_router
 from app.websockets.handlers import router as websocket_router
 
 setup_logging()
@@ -24,6 +25,7 @@ register_error_handlers(app)
 register_request_logging(app)
 app.include_router(v1_router)
 app.include_router(websocket_router)
+app.include_router(ai_websocket_router)
 
 
 @app.get("/health")
