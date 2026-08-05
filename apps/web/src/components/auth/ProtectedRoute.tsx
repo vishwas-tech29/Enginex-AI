@@ -21,20 +21,24 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requiredPlan }: ProtectedRouteProps) {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, hydrate } = useAuth();
+  const { user, isAuthenticated, isLoading, hasHydrated, hydrate } = useAuth();
 
   useEffect(() => {
-    hydrate();
+    if (!hasHydrated) hydrate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    // Gated on hasHydrated: on a hard navigation the store resets to
+    // isAuthenticated: false before hydrate()'s /auth/me call has resolved,
+    // and without this the redirect fires on that stale default instead of
+    // waiting for the real answer — see the hasHydrated comment in authStore.
+    if (hasHydrated && !isLoading && !isAuthenticated) {
       router.replace('/login');
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [hasHydrated, isLoading, isAuthenticated, router]);
 
-  if (isLoading || !isAuthenticated) {
+  if (!hasHydrated || isLoading || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center text-slate-500">
         Loading…

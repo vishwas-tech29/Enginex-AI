@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'heroSecondary';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'heroSecondary' | 'authPrimary';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
@@ -14,6 +14,10 @@ const variantClasses: Record<Variant, string> = {
   // Dark, glassy pill — used on the homepage hero (hero-theme scope), not
   // the light-themed app shell the other variants are for.
   heroSecondary: 'liquid-glass rounded-full text-[hsl(var(--hero-fg))] hover:bg-white/5',
+  // The auth pages (login/register/password reset) are their own dark
+  // glass-themed scope too, same reasoning as heroSecondary above.
+  authPrimary:
+    'bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white shadow-lg shadow-purple-900/40 hover:opacity-90',
 };
 
 const baseClasses: Record<Variant, string> = {
@@ -21,6 +25,7 @@ const baseClasses: Record<Variant, string> = {
   secondary: 'rounded-md px-4 py-2 text-sm',
   ghost: 'rounded-md px-4 py-2 text-sm',
   heroSecondary: '',
+  authPrimary: 'rounded-xl px-4 py-3 text-sm',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

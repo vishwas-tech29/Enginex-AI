@@ -31,30 +31,30 @@ export function RegisterForm() {
       <OAuthButtons />
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {error && (
-          <p className="animate-auth-slide-down text-sm text-red-600" role="alert">
+          <p className="animate-auth-slide-down text-sm text-red-400" role="alert">
             {error}
           </p>
         )}
-        <label className="flex flex-col gap-1 text-sm text-slate-700">
+        <label className="flex flex-col gap-1.5 text-sm text-white/70">
           Name
           <input
             required
             value={name}
             onChange={(event) => setName(event.target.value)}
-            className="rounded-md border border-slate-300 px-3 py-2"
+            className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-white outline-none placeholder:text-white/30 focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-700">
-          Email
+        <label className="flex flex-col gap-1.5 text-sm text-white/70">
+          Email address
           <input
             type="email"
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="rounded-md border border-slate-300 px-3 py-2"
+            className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-white outline-none placeholder:text-white/30 focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-slate-700">
+        <label className="flex flex-col gap-1.5 text-sm text-white/70">
           Password
           <input
             type="password"
@@ -62,10 +62,10 @@ export function RegisterForm() {
             minLength={8}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="rounded-md border border-slate-300 px-3 py-2"
+            className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-white outline-none placeholder:text-white/30 focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
           />
         </label>
-        <Button type="submit" isLoading={isLoading}>
+        <Button type="submit" variant="authPrimary" isLoading={isLoading} className="w-full">
           Create account
         </Button>
       </form>

@@ -48,7 +48,11 @@ function PCBEditorPageContent() {
     const file = event.target.files?.[0];
     if (!file || !projectId) return;
     const created = await upload(file, projectId);
-    setFiles((current) => [created, ...(current ?? [])]);
+    // The initial listForProject() fetch and this optimistic update can
+    // resolve in either order (both are in-flight after upload), so dedupe
+    // by id instead of assuming `current` never already has this file —
+    // otherwise a same-id entry can render twice with a duplicate React key.
+    setFiles((current) => [created, ...(current ?? []).filter((f) => f.id !== created.id)]);
     setActiveFileId(created.id);
     event.target.value = '';
   }

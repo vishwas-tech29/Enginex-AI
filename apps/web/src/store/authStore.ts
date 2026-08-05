@@ -9,6 +9,15 @@ interface AuthState {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  // False until the store has conclusively determined auth state at least
+  // once this page load (no token found, or a hydrate() call resolved).
+  // ProtectedRoute must not redirect to /login before this is true — on a
+  // hard navigation the store resets to isAuthenticated: false, and without
+  // this flag the redirect effect fires on that stale default before
+  // hydrate()'s async /auth/me call has a chance to correct it, bouncing an
+  // already-logged-in user off of every protected page they navigate to
+  // directly (refresh, typed URL, new tab).
+  hasHydrated: boolean;
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
   loginWithOAuthTokens: (tokens: TokenResponse) => void;
@@ -20,13 +29,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: false,
   isAuthenticated: false,
+  hasHydrated: false,
 
   login: async (payload) => {
     set({ isLoading: true });
     try {
       const tokens = await authApi.login(payload);
       storage.setTokens(tokens.access_token, tokens.refresh_token, payload.rememberMe);
-      set({ user: tokens.user, isAuthenticated: true });
+      set({ user: tokens.user, isAuthenticated: true, hasHydrated: true });
     } finally {
       set({ isLoading: false });
     }
@@ -37,7 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const tokens = await authApi.register(payload);
       storage.setTokens(tokens.access_token, tokens.refresh_token);
-      set({ user: tokens.user, isAuthenticated: true });
+      set({ user: tokens.user, isAuthenticated: true, hasHydrated: true });
     } finally {
       set({ isLoading: false });
     }
@@ -47,7 +57,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   // API call needed, just persist and adopt them the same way login() does.
   loginWithOAuthTokens: (tokens) => {
     storage.setTokens(tokens.access_token, tokens.refresh_token);
-    set({ user: tokens.user, isAuthenticated: true });
+    set({ user: tokens.user, isAuthenticated: true, hasHydrated: true });
   },
 
   logout: () => {
@@ -55,11 +65,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     // must always be able to log out locally even if the request fails.
     void authApi.logout().catch(() => undefined);
     storage.clearTokens();
-    set({ user: null, isAuthenticated: false });
+    set({ user: null, isAuthenticated: false, hasHydrated: true });
   },
 
   hydrate: async () => {
-    if (!storage.getAccessToken()) return;
+    if (!storage.getAccessToken()) {
+      set({ hasHydrated: true });
+      return;
+    }
     set({ isLoading: true });
     try {
       const user = await authApi.me();
@@ -68,7 +81,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       storage.clearTokens();
       set({ user: null, isAuthenticated: false });
     } finally {
-      set({ isLoading: false });
+      set({ isLoading: false, hasHydrated: true });
     }
   },
 }));

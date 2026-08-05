@@ -43,8 +43,8 @@ export function ResetPasswordForm() {
   if (succeeded) {
     return (
       <div className="animate-auth-fade-in text-center">
-        <p className="text-sm text-slate-700">Your password has been reset.</p>
-        <Link href="/login" className="mt-4 inline-block text-sm font-medium text-brand-600">
+        <p className="text-sm text-white/70">Your password has been reset.</p>
+        <Link href="/login" className="mt-4 inline-block text-sm font-medium text-purple-300 hover:text-purple-200">
           Log in
         </Link>
       </div>
@@ -54,11 +54,11 @@ export function ResetPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {error && (
-        <p className="animate-auth-slide-down text-sm text-red-600" role="alert">
+        <p className="animate-auth-slide-down text-sm text-red-400" role="alert">
           {error}
         </p>
       )}
-      <label className="flex flex-col gap-1 text-sm text-slate-700">
+      <label className="flex flex-col gap-1.5 text-sm text-white/70">
         New password
         <input
           type="password"
@@ -66,10 +66,10 @@ export function ResetPasswordForm() {
           minLength={8}
           value={newPassword}
           onChange={(event) => setNewPassword(event.target.value)}
-          className="rounded-md border border-slate-300 px-3 py-2"
+          className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-white outline-none placeholder:text-white/30 focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm text-slate-700">
+      <label className="flex flex-col gap-1.5 text-sm text-white/70">
         Confirm new password
         <input
           type="password"
@@ -77,10 +77,10 @@ export function ResetPasswordForm() {
           minLength={8}
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}
-          className="rounded-md border border-slate-300 px-3 py-2"
+          className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-white outline-none placeholder:text-white/30 focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
         />
       </label>
-      <Button type="submit" isLoading={isLoading}>
+      <Button type="submit" variant="authPrimary" isLoading={isLoading} className="w-full">
         Reset password
       </Button>
     </form>

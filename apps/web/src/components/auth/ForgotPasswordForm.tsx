@@ -30,10 +30,11 @@ export function ForgotPasswordForm() {
   if (submitted) {
     return (
       <div className="animate-auth-fade-in text-center">
-        <p className="text-sm text-slate-700">
-          If <span className="font-medium">{email}</span> is registered, we&apos;ve sent a password reset link.
+        <p className="text-sm text-white/70">
+          If <span className="font-medium text-white">{email}</span> is registered, we&apos;ve sent a password
+          reset link.
         </p>
-        <Link href="/login" className="mt-4 inline-block text-sm font-medium text-brand-600">
+        <Link href="/login" className="mt-4 inline-block text-sm font-medium text-purple-300 hover:text-purple-200">
           Back to login
         </Link>
       </div>
@@ -43,24 +44,24 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {error && (
-        <p className="animate-auth-slide-down text-sm text-red-600" role="alert">
+        <p className="animate-auth-slide-down text-sm text-red-400" role="alert">
           {error}
         </p>
       )}
-      <label className="flex flex-col gap-1 text-sm text-slate-700">
-        Email
+      <label className="flex flex-col gap-1.5 text-sm text-white/70">
+        Email address
         <input
           type="email"
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="rounded-md border border-slate-300 px-3 py-2"
+          className="rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-white outline-none placeholder:text-white/30 focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
         />
       </label>
-      <Button type="submit" isLoading={isLoading}>
+      <Button type="submit" variant="authPrimary" isLoading={isLoading} className="w-full">
         Send reset link
       </Button>
-      <Link href="/login" className="text-center text-sm font-medium text-brand-600">
+      <Link href="/login" className="text-center text-sm font-medium text-purple-300 hover:text-purple-200">
         Back to login
       </Link>
     </form>
